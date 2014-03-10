@@ -48,7 +48,7 @@ println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"
 assert(cat == parse(cat.toString))  // round-trip test
 ```
 
-* [Union types](src/main/scala/com/github/pathikrit/dijon/UnionType.scala) for [type-safety](src/main/scala/com/github/pathikrit/dijon/package.scala#L9):
+* [Union types](src/main/scala/com/github/pathikrit/dijon/UnionType.scala) for [type-safety](src/main/scala/com/github/pathikrit/dijon/package.scala#L10):
 ```scala
 val json = `{}`
 json.aString = "hi"                        // compiles

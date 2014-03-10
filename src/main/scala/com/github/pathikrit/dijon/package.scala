@@ -2,12 +2,13 @@ package com.github.pathikrit
 
 import scala.collection.mutable
 import scala.util.parsing.json.{JSON, JSONObject}
+
 import com.github.pathikrit.dijon.UnionType.{∨, ∅}
 
 package object dijon {
 
-  type JsonTypes = (∅ ∨ String ∨ Int ∨ Double ∨ Boolean ∨ JsonArray ∨ JsonObject ∨ None.type)
-  type ValidJsonType[A] = JsonTypes#Member[A]
+  type JsonTypes = ∅ ∨ String ∨ Int ∨ Double ∨ Boolean ∨ JsonArray ∨ JsonObject ∨ None.type
+  type JsonType[A] = JsonTypes#Member[A]
   type SomeJson = Json[A] forSome {type A}
 
   type JsonObject = mutable.Map[String, SomeJson]
@@ -16,7 +17,7 @@ package object dijon {
   type JsonArray = mutable.Buffer[SomeJson]
   def `[]`: SomeJson = mutable.Buffer.empty[SomeJson]
 
-  implicit class Json[A: ValidJsonType](val underlying: A) extends Dynamic {
+  implicit class Json[A : JsonType](val underlying: A) extends Dynamic {
 
     def selectDynamic(key: String): SomeJson = underlying match {
       case obj: JsonObject if obj contains key => obj(key)
@@ -36,9 +37,7 @@ package object dijon {
 
     def update(index: Int, value: SomeJson): Unit = underlying match {
       case arr: JsonArray if index >= 0 =>
-        while(arr.size <= index) {
-          arr += null
-        }
+        while(arr.size <= index) { arr += null }
         arr(index) = value
       case _ =>
     }
@@ -46,26 +45,24 @@ package object dijon {
     override def toString = underlying match {
       case obj: JsonObject => new JSONObject(obj.toMap).toString
       case arr: JsonArray => arr mkString ("[", ", ", "]")
-      case str: String => "\"" + str + "\""     //TODO: use string interpolation here
+      case str: String => s""""$str""""
       case _ => underlying.toString
     }
 
-    override def equals(that: Any) = that match {
-      case other: SomeJson => underlying == other.underlying
-      case _ => underlying == that
-    }
+    override def equals(obj: Any) = underlying == (obj match {
+      case that: SomeJson => that.underlying
+      case _ => obj
+    })
 
     override def hashCode = underlying.hashCode
   }
 
-  implicit def toScalaType[A: ValidJsonType](json: SomeJson): A = json.underlying.asInstanceOf[A]
+  implicit def toUnderlying[A : JsonType] = (json: SomeJson) => json.underlying.asInstanceOf[A]
   // TODO: better way to write this?
-  //implicit def toMap(json: SomeJson): JsonObject = toScalaType(json)
-  //implicit def toArray(json: SomeJson): JsonArray = toScalaType(json)
-  implicit val `SomeJson -> String` = toScalaType[String] _
-  implicit val `SomeJson -> Int` = toScalaType[Int] _
-  implicit val `SomeJson -> Double` = toScalaType[Double] _
-  implicit val `SomeJson -> Boolean` = toScalaType[Boolean] _
+  implicit val `SomeJson -> String` = toUnderlying[String]
+  implicit val `SomeJson -> Int` = toUnderlying[Int]
+  implicit val `SomeJson -> Double` = toUnderlying[Double]
+  implicit val `SomeJson -> Boolean` = toUnderlying[Boolean]
 
   def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble).get
 
