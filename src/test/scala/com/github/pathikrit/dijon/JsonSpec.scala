@@ -1,6 +1,7 @@
 package com.github.pathikrit.dijon
 
 import com.github.pathikrit.dijon.Json._
+import com.github.pathikrit.dijon.DisjointType._
 
 import org.specs2.mutable.Specification
 
@@ -11,7 +12,7 @@ class JsonSpec extends Specification {
     val (email1, email2) = ("pathikritbhowmick@msn.com", "pathikrit.bhowmick@gmail.com")
     val (name, age) = ("Rick", 27)
 
-    val json = json"""
+    val rick = json"""
       {
         "name": "$name",
         "age": $age,
@@ -37,7 +38,6 @@ class JsonSpec extends Specification {
      """
 
     "parse objects" in {
-      val Some(rick) = json
       rick.name mustEqual name
       rick.name mustNotEqual "Ryan"
 
@@ -72,6 +72,9 @@ class JsonSpec extends Specification {
       rick.hobbies(1).games.football mustEqual false
       rick.hobbies(1).games.football mustNotEqual 0
 
+      rick.hobbies(2)(0) mustEqual "coding"
+      rick.hobbies(2)(0) mustNotEqual "cooking"
+
       rick.hobbies(2)(1)(1) mustEqual "scala"
       rick.hobbies(2)(1)(1) mustNotEqual "java"
       rick.hobbies(2)(100) mustEqual None
@@ -84,47 +87,44 @@ class JsonSpec extends Specification {
     }
 
     "parse arrays" in {
-//      val Some(empty) = parse("[]")
-//      empty(0) mustEqual None
-//
-//      val Some(arr) = json"""[1, true, null, "hi"]"""
-//      val i: Double = arr(0)
-//      i mustEqual 1
-//
-//      val b: Boolean = arr(1)
-//      b must beTrue
-//
-//      val n = arr(2)
-//      n mustEqual null
-//
-//      val s: String = arr(3)
-//      s mustEqual "hi"
-//
-//      val u = arr(4)
-//      u mustEqual None
-      todo
+      val empty = parse("[]")
+      empty(0) mustEqual None
+
+      val arr = json"""[1, true, null, "hi", {"key": "value"}]"""
+      val i: Double = arr(0)
+      i mustEqual 1
+
+      val b: Boolean = arr(1)
+      b must beTrue
+
+      val n = arr(2)
+      assert(n == null)
+
+      val s: String = arr(3)
+      s mustEqual "hi"
+
+      //val m: Map[String, SomeJson] = arr(4)
+      //m("key") mustEqual "value2"
+
+      //val u: None.type = arr(5)
+      //u must beNone
     }
 
-    "parse primitivies" in {
-//      val Some(int: Int) = parse("23")
-//      int mustEqual 23
-//
-//      val Some(string: String) = parse("hi")
-//      string mustEqual "hi"
-//
-//      val Some(double: Double) = parse("3.4")
-//      double mustEqual "3.4"
-//
-//      val Some(boolean: Boolean) = parse("true")
-//      boolean must beTrue
-      todo
+    "not parse primitives" in {
+      parse("23") must throwAn[Exception]
+      parse("hi") must throwAn[Exception]
+      parse("3.4") must throwAn[Exception]
+      parse("true") must throwAn[Exception]
+    }
+
+    "parse empty object" in {
+      val obj = json"{}"
+      obj.toString mustEqual "{}"
     }
 
     "work for examples" in {
-      import com.github.pathikrit.dijon.Json._
-
       val (name, age) = ("Tigri", 7)
-      val Some(cat) = json"""
+      val cat = json"""
         {
           "name": "$name",
           "age": $age,
@@ -133,24 +133,29 @@ class JsonSpec extends Specification {
         }
       """
       assert(cat.name == name)
+
       assert(cat.age == age)
+      //assert(cat.age != age + 1)
+      //cat.age = cat.age + 1
+      //assert(cat.age == age + 1)
+
       assert(cat.hobbies(1) == "purring")
       assert(cat.`is cat` == true)
       assert(cat.email == None)
 
-//      val vet = JsonObject
-//      vet.name = "Dr. Kitty Specialist"
-//      vet.address.name = "Silicon Valley Animal Hospital"
-//      vet.address.city = "Palo Alto"
-//      vet.address.zip = 94306
-//
-//      cat.vet = vet
+      val vet = JsonObject
+      vet.name = "Dr. Kitty Specialist"
+      vet.address = JsonObject
+      vet.address.name = "Silicon Valley Animal Hospital"
+      vet.address.city = "Palo Alto"
+      vet.address.zip = 94306
+
+      cat.vet = vet
+      assert(cat.vet.address.zip == 94306)
 
       println(cat)
+      //{"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Silicon Valley Animal Hospital"}, "name" : "Dr. Kitty Specialist"}, "is cat" : true, "age" : 7.0}
 
-      //val vetZip: Int = cat.vet.address.zip
-      //vetZip mustEqual vet.address.zip
-      //vetZip mustNotEqual 94041
       ok
     }
   }

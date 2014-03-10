@@ -4,7 +4,7 @@ import scala.collection.mutable
 import scala.util.parsing.json.{JSON, JSONObject}
 import DisjointType._
 
-object Json {
+object Json extends App {
 
   type JsonTypes = (String v Int v Double v Boolean v Null v JsonArray v JsonObject v None.type)
   type ValidJsonType[A] = A => JsonTypes
@@ -58,9 +58,16 @@ object Json {
     override def hashCode = underlying.hashCode
   }
 
-  implicit def fromJson[A: ValidJsonType](json: SomeJson): A = json.underlying.asInstanceOf[A]
+  implicit def toScalaType[A: ValidJsonType](json: SomeJson): A = json.underlying.asInstanceOf[A]
+  // TODO: better way to write this?
+  //implicit def toMap(json: SomeJson): JsonObject = toScalaType(json)
+  //implicit def toArray(json: SomeJson): JsonArray = toScalaType(json)
+  implicit def toString(json: SomeJson): String = json.underlying.asInstanceOf[String]
+  implicit def toInt(json: SomeJson): Int = json.underlying.asInstanceOf[Int]
+  implicit def toDouble(json: SomeJson): Double = json.underlying.asInstanceOf[Double]
+  implicit def toBoolean(json: SomeJson): Boolean = json.underlying.asInstanceOf[Boolean]
 
-  def parse(s: String) = JSON.parseFull(s) map assemble
+  def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble).get
 
   def assemble(s: Any): SomeJson = s match {
     case null => null
@@ -73,6 +80,6 @@ object Json {
   }
 
   implicit class JsonStringContext(val sc: StringContext) extends AnyVal {
-    def json(args: Any*) = parse(sc.s(args: _*))
+    def json(args: Any*): SomeJson = parse(sc.s(args: _*))
   }
 }
