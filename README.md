@@ -11,19 +11,19 @@ dijon - Dynamic Json in Scala
 ```scala
 val (name, age) = ("Tigri", 7)
 val cat = json"""
-{
-  "name": "$name",
-  "age": $age,
-  "hobbies": ["eating", "purring"],
-  "is cat": true
-}
+  {
+     "name": "$name",
+     "age": $age,
+     "hobbies": ["eating", "purring"],
+     "is cat": true
+  }
 """
 assert(cat.name == name)
 
 assert(cat.age == age)
-//assert(cat.age != age + 1)
-//cat.age = cat.age + 1
-//assert(cat.age == age + 1)
+val catAge: Double = cat.age
+cat.age = catAge + 1
+assert(cat.age == 8)
 
 assert(cat.hobbies(1) == "purring")
 assert(cat.`is cat` == true)
