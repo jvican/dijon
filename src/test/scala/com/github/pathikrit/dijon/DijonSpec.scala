@@ -31,7 +31,8 @@ class DijonSpec extends Specification {
            },
            ["coding", ["python", "scala"]],
            null
-          ]
+          ],
+          "keys": [23, 345, true]
        }
      """
 
@@ -50,6 +51,7 @@ class DijonSpec extends Specification {
 
       rick.weight mustEqual 175.1
       rick.weight mustNotEqual 175.0999
+      rick.weight.keys mustEqual None
 
       rick.contact.emails(0) mustEqual email1
       rick.contact.emails(0) mustNotEqual email2
@@ -61,9 +63,11 @@ class DijonSpec extends Specification {
       rick.contact.emails(2) mustEqual None
       rick.wife mustEqual None
       rick.wife.name mustEqual None
+      rick.wife.keys mustEqual None
 
       rick.hobbies(0) mustEqual "eating"
       rick.hobbies(0) mustNotEqual "cooking"
+      rick.hobbies(0).keys mustEqual None
 
       rick.hobbies(1).games.chess mustEqual true
       rick.hobbies(1).games.chess mustNotEqual "yes"
@@ -83,7 +87,10 @@ class DijonSpec extends Specification {
       rick.hobbies(4) mustNotEqual null
       rick.hobbies(4) mustEqual None
 
+      rick.keys mustEqual Some(Set("name", "age", "class", "contact", "is online", "weight", "hobbies", "keys"))
+      rick.selectDynamic("keys")(1) mustEqual 345
       rick mustEqual parse(rick.toString) // round-trip test
+
     }
 
     "parse arrays" in {
@@ -112,6 +119,8 @@ class DijonSpec extends Specification {
 
       //val u: None.type = arr(5)
       //u must beNone
+
+      arr.keys mustEqual None
     }
 
     "work for example 1" in {
@@ -149,6 +158,7 @@ class DijonSpec extends Specification {
       assert(vet.address == mutable.Map("name" -> "Animal Hospital", "city" -> "Palo Alto", "zip" -> 94306))
 
       cat.vet = vet                        // json setter
+      assert(cat.keys == Some(Set("name", "age", "hobbies", "is cat", "vet")))    // get all keys
       assert(cat.vet.phones(2) == phone)
       assert(cat.vet.address.zip == 94306)
 
@@ -196,6 +206,7 @@ class DijonSpec extends Specification {
       val obj = json"{}"
       obj.toString mustEqual "{}"
       obj mustEqual `{}`
+      obj.keys mustEqual Some(Set.empty[String])
     }
 
     "tolerate special symbols" in {
@@ -204,7 +215,7 @@ class DijonSpec extends Specification {
       json.★ mustNotEqual "23"
       json.★ = "23"
       json.★ mustEqual "23"
-      json.updateDynamic("+", true)               //sometimes we have to resort to this json.+ won't compile
+      json.updateDynamic("+")(true)               //sometimes we have to resort to this json.+ won't compile
       json.selectDynamic("+") mustEqual true
       json.selectDynamic("+") mustNotEqual "true"
     }

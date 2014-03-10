@@ -55,6 +55,11 @@ package object dijon {
     })
 
     override def hashCode = underlying.hashCode
+
+    def keys: Option[Set[String]] = underlying match {
+      case obj: JsonObject => Some(obj.keySet.toSet)
+      case _ => None
+    }
   }
 
   implicit def toUnderlying[A : JsonType] = (json: SomeJson) => json.underlying.asInstanceOf[A]

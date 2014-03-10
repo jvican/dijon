@@ -43,12 +43,12 @@ vet.address.zip = 94306
 assert(vet.address == mutable.Map("name" -> "Animal Hospital", "city" -> "Palo Alto", "zip" -> 94306))
 
 cat.vet = vet                        // json setter
+assert(cat.keys == Some(Set("name", "age", "hobbies", "is cat", "vet")))    // get all keys
 assert(cat.vet.phones(2) == phone)
 assert(cat.vet.address.zip == 94306)
 
 println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 8.0}
 assert(cat == parse(cat.toString))   // round-trip test
-
 ```
 
 * [Union types](src/main/scala/com/github/pathikrit/dijon/UnionType.scala) for [type-safety](src/main/scala/com/github/pathikrit/dijon/package.scala#L10):
