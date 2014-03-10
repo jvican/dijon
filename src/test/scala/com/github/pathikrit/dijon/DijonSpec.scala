@@ -82,6 +82,8 @@ class DijonSpec extends Specification {
       rick.hobbies(3) mustNotEqual None
       rick.hobbies(4) mustNotEqual null
       rick.hobbies(4) mustEqual None
+
+      rick mustEqual parse(rick.toString) // round-trip test
     }
 
     "parse arrays" in {
@@ -108,19 +110,6 @@ class DijonSpec extends Specification {
       //u must beNone
     }
 
-    "not parse primitives" in {
-      parse("23") must throwAn[Exception]
-      parse("hi") must throwAn[Exception]
-      parse("\"hi\"") must throwAn[Exception]
-      parse("3.4") must throwAn[Exception]
-      parse("true") must throwAn[Exception]
-    }
-
-    "parse empty object" in {
-      val obj = json"{}"
-      obj.toString mustEqual "{}"
-    }
-
     "work for example 1" in {
       val (name, age) = ("Tigri", 7)
       val cat = json"""
@@ -145,8 +134,9 @@ class DijonSpec extends Specification {
       val vet = `{}`        // create empty json object
       vet.name = "Dr. Kitty Specialist"
       vet.phones = `[]`     // create empty json array
-      vet.phones(2) = "(650) 493-4233"                // set the 3rd item in array to this phone
-      assert(vet.phones == mutable.Seq(null, null, "(650) 493-4233")) // first 2 entries null
+      val phone = "(650) 493-4233"
+      vet.phones(2) = phone                // set the 3rd item in array to this phone
+      assert(vet.phones == mutable.Seq(null, null, phone)) // first 2 entries null
 
       vet.address = `{}`
       vet.address.name = "Silicon Valley Animal Hospital"
@@ -154,10 +144,10 @@ class DijonSpec extends Specification {
       vet.address.zip = 94306
 
       cat.vet = vet
-      assert(cat.vet.address.zip == 94306)
+      assert(cat.vet.phones(2) == phone)
 
-      println(cat)
-      //{"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Silicon Valley Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 8.0}
+      println(cat) //{"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Silicon Valley Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 8.0}
+      assert(cat == parse(cat.toString))  // round-trip test
 
       ok
     }
@@ -172,6 +162,32 @@ class DijonSpec extends Specification {
       assert(i == 23)
       //val j: Int = json.aBoolean    // run-time exception
       ok
+    }
+
+    "grow arrays" in {
+      val langs = json"""["scala", ["python2", "python3"]]"""
+      langs(-2) = "java"
+      langs(5) = "F#"
+      langs(3) mustEqual null
+      langs(5) mustEqual "F#"
+      langs(1)(3) = "python4"
+      langs(1)(3) mustEqual "python4"
+      langs(3) = `{}`
+      langs(3).java = "sux"
+      langs.toString mustEqual """["scala", ["python2", "python3", null, "python4"], null, {"java" : "sux"}, null, "F#"]"""
+    }
+
+    "not parse primitives" in {
+      parse("23") must throwAn[Exception]
+      parse("hi") must throwAn[Exception]
+      parse("\"hi\"") must throwAn[Exception]
+      parse("3.4") must throwAn[Exception]
+      parse("true") must throwAn[Exception]
+    }
+
+    "parse empty object" in {
+      val obj = json"{}"
+      obj.toString mustEqual "{}"
     }
   }
 }
