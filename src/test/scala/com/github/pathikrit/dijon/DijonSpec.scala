@@ -1,7 +1,6 @@
 package com.github.pathikrit.dijon
 
-import com.github.pathikrit.dijon._
-import com.github.pathikrit.dijon.DisjointType._
+import com.github.pathikrit.dijon.UnionType._
 
 import org.specs2.mutable.Specification
 
@@ -122,7 +121,7 @@ class DijonSpec extends Specification {
       obj.toString mustEqual "{}"
     }
 
-    "work for examples" in {
+    "work for example 1" in {
       val (name, age) = ("Tigri", 7)
       val cat = json"""
         {
@@ -156,6 +155,18 @@ class DijonSpec extends Specification {
       println(cat)
       //{"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Silicon Valley Animal Hospital"}, "name" : "Dr. Kitty Specialist"}, "is cat" : true, "age" : 7.0}
 
+      ok
+    }
+
+    "work for example 2" in {
+      val json = JsonObject
+      json.aString = "hi"                        // compiles
+      json.aBoolean = true                       // compiles
+      json.anInt = 23                            // compiles
+      // test.somethingElse = Option("hi")       // does not compile
+      val i: Int = json.anInt
+      assert(i == 23)
+      //val j: Int = json.aBoolean    // run-time exception
       ok
     }
   }

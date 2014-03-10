@@ -3,15 +3,6 @@
 dijon - Dynamic Json in Scala
 =====
 * Boiler-free json handling using Scala [Dynamic Types](http://www.scala-lang.org/api/2.10.3/index.html#scala.Dynamic)
-* Type-safe through [union types](src/main/scala/com/github/pathikrit/dijon/DisjointType.scala)
-```scala
-val test = JsonObject
-test.aString = "hi"     // compiles
-test.aBoolean = true    // compiles
-test.anInt = 23         // compiles
-test.`null` = null      // compiles
-// test.somethingElse = Set.empty[String]  // does not compile
-```
 * No external [dependencies](build.sbt)
 * Less than [100 lines](src/main/scala/com/github/pathikrit/dijon/package.scala) of code
 * Well [tested][1]
@@ -50,6 +41,18 @@ assert(cat.vet.address.zip == 94306)
 
 println(cat)
 //{"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Silicon Valley Animal Hospital"}, "name" : "Dr. Kitty Specialist"}, "is cat" : true, "age" : 7.0}
+```
+
+* [Union types](src/main/scala/com/github/pathikrit/dijon/package.scala#L9) for type-safety:
+```scala
+val json = JsonObject
+json.aString = "hi"                        // compiles
+json.aBoolean = true                       // compiles
+json.anInt = 23                            // compiles
+// test.somethingElse = Set.empty[String]  // does not compile
+val i: Int = json.anInt
+assert(i == 23)
+//val j: Int = json.aBoolean    // run-time exception
 ```
 
 See the [spec][1] for more examples.

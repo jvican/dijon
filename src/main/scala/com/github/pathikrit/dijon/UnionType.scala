@@ -1,7 +1,7 @@
 package com.github.pathikrit.dijon
 
-// TODO: use Union types using Curry-Howard: http://www.chuusai.com/2011/06/09/scala-union-types-curry-howard/
-object DisjointType {
+// TODO: do Union types using Curry-Howard: http://www.chuusai.com/2011/06/09/scala-union-types-curry-howard/
+object UnionType {
   type v[A,B] = Either[Option[A], Option[B]]
 
   private def L[A,B](a: A): v[A,B] = Left(Some(a))

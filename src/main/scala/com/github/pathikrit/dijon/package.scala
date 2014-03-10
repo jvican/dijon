@@ -4,19 +4,19 @@ import scala.collection.mutable
 import scala.util.parsing.json.{JSON, JSONObject}
 
 package object dijon extends App {
-  import DisjointType._
+  import UnionType._
 
   type JsonTypes = (String v Int v Double v Boolean v Null v JsonArray v JsonObject v None.type)
   type ValidJsonType[A] = A => JsonTypes
-  type SomeJson = JsonElement[A] forSome {type A}
+  type SomeJson = Json[A] forSome {type A}
 
   type JsonObject = mutable.Map[String, SomeJson]
   def JsonObject: SomeJson = mutable.Map.empty[String, SomeJson]
 
   type JsonArray = mutable.Buffer[SomeJson]
-  def JsonArray: JsonElement[JsonArray] = mutable.Buffer.empty[SomeJson]
+  def JsonArray: Json[JsonArray] = mutable.Buffer.empty[SomeJson]
 
-  implicit class JsonElement[A: ValidJsonType](val underlying: A) extends Dynamic {
+  implicit class Json[A: ValidJsonType](val underlying: A) extends Dynamic {
 
     def selectDynamic(key: String): SomeJson = underlying match {
       case obj: JsonObject if obj contains key => obj(key)
@@ -46,7 +46,7 @@ package object dijon extends App {
     override def toString = underlying match {
       case obj: JsonObject => new JSONObject(obj.toMap).toString
       case arr: JsonArray => arr mkString ("[", ", ", "]")
-      case str: String => "\"" + str + "\""     //todo: use string interpolation here
+      case str: String => "\"" + str + "\""     //TODO: use string interpolation here
       case _ => underlying.toString
     }
 
