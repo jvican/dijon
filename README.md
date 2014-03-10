@@ -2,7 +2,7 @@
 
 dijon - Dynamic Json in Scala
 =====
-* Boiler-free json handling using Scala [Dynamic Types](http://www.scala-lang.org/api/2.10.3/index.html#scala.Dynamic)
+* Boiler-free json wrangling using Scala [Dynamic Types](http://www.scala-lang.org/api/2.10.3/index.html#scala.Dynamic)
 * No external [dependencies](build.sbt)
 * Less than [100 lines](src/main/scala/com/github/pathikrit/dijon/package.scala) of code
 * Well [tested][1]
@@ -11,12 +11,12 @@ dijon - Dynamic Json in Scala
 ```scala
 val (name, age) = ("Tigri", 7)
 val cat = json"""
-{
-  "name": "$name",
-  "age": $age,
-  "hobbies": ["eating", "purring"],
-  "is cat": true
-}
+  {
+    "name": "$name",
+    "age": $age,
+    "hobbies": ["eating", "purring"],
+    "is cat": true
+  }
 """
 assert(cat.name == name)
 
@@ -48,7 +48,7 @@ println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"
 assert(cat == parse(cat.toString))  // round-trip test
 ```
 
-* [Union types](src/main/scala/com/github/pathikrit/dijon/package.scala#L8) for type-safety:
+* [Union types](src/main/scala/com/github/pathikrit/dijon/UnionType.scala) for [type-safety](src/main/scala/com/github/pathikrit/dijon/package.scala#L9):
 ```scala
 val json = `{}`
 json.aString = "hi"                        // compiles
