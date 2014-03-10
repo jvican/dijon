@@ -204,9 +204,9 @@ class DijonSpec extends Specification {
       json.★ mustNotEqual "23"
       json.★ = "23"
       json.★ mustEqual "23"
-      json.`+` = true
-      json.`+` mustEqual true
-      json.`+` mustNotEqual "true"
+      json.updateDynamic("+", true)               //sometimes we have to resort to this json.+ won't compile
+      json.selectDynamic("+") mustEqual true
+      json.selectDynamic("+") mustNotEqual "true"
     }
   }
 }

@@ -66,4 +66,12 @@ val j: Int = json.aBoolean                 // run-time exception
 See the [spec][1] for more examples.
 
 
+TODO
+====
+* Circular references checker
+* Pretty printer
+* Better parse errors + more test cases for invalid JSONs
+* Pluggable custom types e.g. BigDecimal and Date
+
+
 [1]: src/test/scala/com/github/pathikrit/dijon/DijonSpec.scala
