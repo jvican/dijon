@@ -89,8 +89,12 @@ class DijonSpec extends Specification {
     "parse arrays" in {
       val empty = parse("[]")
       empty(0) mustEqual None
+      empty mustEqual `[]`
+      empty mustEqual parse(empty.toString)
 
       val arr = json"""[1, true, null, "hi", {"key": "value"}]"""
+      arr mustEqual parse(arr.toString)
+
       val i: Double = arr(0)
       i mustEqual 1
 
@@ -175,6 +179,7 @@ class DijonSpec extends Specification {
       langs(3) = `{}`
       langs(3).java = "sux"
       langs.toString mustEqual """["scala", ["python2", "python3", null, "python4"], null, {"java" : "sux"}, null, "F#"]"""
+      langs mustEqual parse(langs.toString)
     }
 
     "not parse primitives" in {
@@ -188,6 +193,7 @@ class DijonSpec extends Specification {
     "parse empty object" in {
       val obj = json"{}"
       obj.toString mustEqual "{}"
+      obj mustEqual `{}`
     }
   }
 }
