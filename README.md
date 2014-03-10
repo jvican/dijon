@@ -1,11 +1,11 @@
-[![Build Status](https://travis-ci.org/pathikrit/dijon.png)](http://travis-ci.org/pathikrit/dijon) [![Coverage Status](https://coveralls.io/repos/pathikrit/dijon/badge.png)](https://coveralls.io/r/pathikrit/dijon)
+[![Build Status](https://travis-ci.org/pathikrit/dijon.png)](http://travis-ci.org/pathikrit/dijon)
 
-dijon - A Dynamic Typed Scala Json Library
+dijon - A Scala Dynamic Json Library
 =====
-* Uses Scala Dynamic types that let's you write boiler-free json:
+* Uses [Scala Dynamic types](http://www.scala-lang.org/api/2.10.3/index.html#scala.Dynamic) that let's you write boiler-free json
 * [No external dependencies](build.sbt)
 * [Less than 100 lines of code](src/main/scala/com/github/pathikrit/dijon/Json.scala)
-* Why yet another scala json library? Well, code speaks more than thousand words:
+* Why yet another Scala json library? Well, code speaks more than thousand words:
 
 ```scala
 import com.github.pathikrit.dijon.Json._

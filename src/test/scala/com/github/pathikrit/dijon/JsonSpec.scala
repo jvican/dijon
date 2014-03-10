@@ -11,7 +11,7 @@ class JsonSpec extends Specification {
     val (email1, email2) = ("pathikritbhowmick@msn.com", "pathikrit.bhowmick@gmail.com")
     val (name, age) = ("Rick", 27)
 
-    val Some(rick) = json"""
+    val json = json"""
       {
         "name": "$name",
         "age": $age,
@@ -37,6 +37,7 @@ class JsonSpec extends Specification {
      """
 
     "parse objects" in {
+      val Some(rick) = json
       rick.name mustEqual name
       rick.name mustNotEqual "Ryan"
 
@@ -123,30 +124,33 @@ class JsonSpec extends Specification {
       import com.github.pathikrit.dijon.Json._
 
       val (name, age) = ("Tigri", 7)
-      val Some(cat) = json"""{"name": "$name", "info": {"age": $age, "hobbies": ["eating", "purring"]}, "is cat": true}"""
-
+      val Some(cat) = json"""
+        {
+          "name": "$name",
+          "age": $age,
+          "hobbies": ["eating", "purring"],
+          "is cat": true
+        }
+      """
       assert(cat.name == name)
-      assert(cat.info.age == age)
-      assert(cat.info.hobbies(1) == "purring")
-      //assert(cat.`is cat` == true)
+      assert(cat.age == age)
+      assert(cat.hobbies(1) == "purring")
+      assert(cat.`is cat` == true)
       assert(cat.email == None)
 
-//      val vet = new JsonObject
+//      val vet = JsonObject
 //      vet.name = "Dr. Kitty Specialist"
-//      vet.address = new JsonObject
-//      vet.address.name = "Palo Alto Pet Clinic"
+//      vet.address.name = "Silicon Valley Animal Hospital"
 //      vet.address.city = "Palo Alto"
-//      vet.address.zip = 94041
+//      vet.address.zip = 94306
 //
 //      cat.vet = vet
-//
-//      println(cat)
 
-      // prints {"vet" : {"address" : {"city" : Palo Alto, "zip" : 94041, "name" : Palo Alto Pet Clinic}, "name" : Dr. Kitty Specialist}, "is cat" : true, "name" : Tigri, "info" : {"hobbies" : [eating, purring], "age" : 7.0}}
+      println(cat)
 
       //val vetZip: Int = cat.vet.address.zip
-
-      //vetZip mustEqual 94041
+      //vetZip mustEqual vet.address.zip
+      //vetZip mustNotEqual 94041
       ok
     }
   }

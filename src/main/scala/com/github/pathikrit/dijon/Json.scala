@@ -28,25 +28,25 @@ object Json {
       case _ =>
     }
 
-    def applyDynamic(key: String)(i: Int): SomeJson = underlying match {
-      case obj: JsonObject if obj contains key => obj(key)(i)
-      case arr: JsonArray if key == "apply" && (arr isDefinedAt i) => arr(i)
+    def applyDynamic(key: String)(index: Int): SomeJson = underlying match {
+      case obj: JsonObject if obj contains key => obj(key)(index)
+      case arr: JsonArray if key == "apply" && (arr isDefinedAt index) => arr(index)
       case _ => None
     }
 
-    def update(i: Int, value: SomeJson): Unit = underlying match {
-      case arr: JsonArray if i >= 0 =>
-        while(arr.size <= i) {
+    def update(index: Int, value: SomeJson): Unit = underlying match {
+      case arr: JsonArray if index >= 0 =>
+        while(arr.size <= index) {
           arr += null
         }
-        arr(i) = value
+        arr(index) = value
       case _ =>
     }
 
     override def toString = underlying match {
       case obj: JsonObject => new JSONObject(obj.toMap).toString
       case arr: JsonArray => arr mkString ("[", ", ", "]")
-      case str: String => "\"" + str + "\""
+      case str: String => "\"" + str + "\""     //todo: use string interpolation here
       case _ => underlying.toString
     }
 
