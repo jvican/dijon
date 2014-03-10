@@ -20,13 +20,12 @@ val cat = json"""
 """
 assert(cat.name == name)
 
-assert(cat.age == age)
 val catAge: Double = cat.age      // type inference
 cat.age = catAge + 1
-assert(cat.age == 8)
+assert(cat.age == age + 1)
 
 assert(cat.hobbies(1) == "purring")
-assert(cat.`is cat` == true)
+assert(cat.`is cat` == true)    // keys with spaces/symbols/scala-keywords need to be escaped with ticks
 assert(cat.email == None)
 
 val vet = `{}`        // create empty json object
@@ -43,8 +42,6 @@ vet.address.zip = 94306
 
 cat.vet = vet
 assert(cat.vet.phones(2) == phone)
-
-cat.vet = vet
 assert(cat.vet.address.zip == 94306)
 
 println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Silicon Valley Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 8.0}
