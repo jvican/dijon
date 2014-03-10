@@ -1,7 +1,5 @@
 package com.github.pathikrit.dijon
 
-import com.github.pathikrit.dijon.UnionType._
-
 import org.specs2.mutable.Specification
 
 class DijonSpec extends Specification {

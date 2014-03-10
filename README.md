@@ -43,13 +43,13 @@ println(cat)
 //{"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Silicon Valley Animal Hospital"}, "name" : "Dr. Kitty Specialist"}, "is cat" : true, "age" : 7.0}
 ```
 
-* [Union types](src/main/scala/com/github/pathikrit/dijon/package.scala#L9) for type-safety:
+* [Union types](src/main/scala/com/github/pathikrit/dijon/package.scala#L8) for type-safety:
 ```scala
 val json = JsonObject
 json.aString = "hi"                        // compiles
 json.aBoolean = true                       // compiles
 json.anInt = 23                            // compiles
-// test.somethingElse = Set.empty[String]  // does not compile
+// test.somethingElse = Option("hi")       // does not compile
 val i: Int = json.anInt
 assert(i == 23)
 //val j: Int = json.aBoolean    // run-time exception
