@@ -84,7 +84,7 @@ class DijonSpec extends Specification {
     }
 
     "parse arrays" in {
-      val empty = parse("[]")
+      val empty = json("[]")
       empty(0) mustEqual None
 
       val arr = json"""[1, true, null, "hi", {"key": "value"}]"""
@@ -108,11 +108,11 @@ class DijonSpec extends Specification {
     }
 
     "not parse primitives" in {
-      parse("23") must throwAn[Exception]
-      parse("hi") must throwAn[Exception]
-      parse("\"hi\"") must throwAn[Exception]
-      parse("3.4") must throwAn[Exception]
-      parse("true") must throwAn[Exception]
+      json("23") must throwAn[Exception]
+      json("hi") must throwAn[Exception]
+      json("\"hi\"") must throwAn[Exception]
+      json("3.4") must throwAn[Exception]
+      json("true") must throwAn[Exception]
     }
 
     "parse empty object" in {
@@ -141,9 +141,9 @@ class DijonSpec extends Specification {
       assert(cat.`is cat` == true)
       assert(cat.email == None)
 
-      val vet = JsonObject
+      val vet = `{}`
       vet.name = "Dr. Kitty Specialist"
-      vet.address = JsonObject
+      vet.address = `{}`
       vet.address.name = "Silicon Valley Animal Hospital"
       vet.address.city = "Palo Alto"
       vet.address.zip = 94306
@@ -158,7 +158,7 @@ class DijonSpec extends Specification {
     }
 
     "work for example 2" in {
-      val json = JsonObject
+      val json = `{}`
       json.aString = "hi"                        // compiles
       json.aBoolean = true                       // compiles
       json.anInt = 23                            // compiles

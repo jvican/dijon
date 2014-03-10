@@ -10,10 +10,10 @@ package object dijon {
   type SomeJson = Json[A] forSome {type A}
 
   type JsonObject = mutable.Map[String, SomeJson]
-  def JsonObject: SomeJson = mutable.Map.empty[String, SomeJson]
+  def `{}`: SomeJson = mutable.Map.empty[String, SomeJson]
 
   type JsonArray = mutable.Buffer[SomeJson]
-  def JsonArray: SomeJson = mutable.Buffer.empty[SomeJson]
+  def `[]`: SomeJson = mutable.Buffer.empty[SomeJson]
 
   implicit class Json[A: ValidJsonType](val underlying: A) extends Dynamic {
 
@@ -66,7 +66,7 @@ package object dijon {
   implicit val `SomeJson -> Double` = toScalaType[Double] _
   implicit val `SomeJson -> Boolean` = toScalaType[Boolean] _
 
-  def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble).get
+  def json(s: String): SomeJson = (JSON.parseFull(s) map assemble).get
 
   def assemble(s: Any): SomeJson = s match {
     case null => null
@@ -79,7 +79,7 @@ package object dijon {
   }
 
   implicit class JsonStringContext(val sc: StringContext) extends AnyVal {
-    def json(args: Any*): SomeJson = parse(sc.s(args: _*))
+    def json(args: Any*): SomeJson = json(sc.s(args: _*))
   }
 
   // TODO: do Union types using Curry-Howard: http://www.chuusai.com/2011/06/09/scala-union-types-curry-howard/

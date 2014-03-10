@@ -29,9 +29,9 @@ assert(cat.hobbies(1) == "purring")
 assert(cat.`is cat` == true)
 assert(cat.email == None)
 
-val vet = JsonObject
+val vet = `{}`
 vet.name = "Dr. Kitty Specialist"
-vet.address = JsonObject
+vet.address = `{}`
 vet.address.name = "Silicon Valley Animal Hospital"
 vet.address.city = "Palo Alto"
 vet.address.zip = 94306
@@ -45,7 +45,7 @@ println(cat)
 
 * [Union types](src/main/scala/com/github/pathikrit/dijon/package.scala#L8) for type-safety:
 ```scala
-val json = JsonObject
+val json = `{}`
 json.aString = "hi"                        // compiles
 json.aBoolean = true                       // compiles
 json.anInt = 23                            // compiles
