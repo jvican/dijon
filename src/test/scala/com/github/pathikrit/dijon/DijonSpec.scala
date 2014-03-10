@@ -110,6 +110,7 @@ class DijonSpec extends Specification {
     "not parse primitives" in {
       parse("23") must throwAn[Exception]
       parse("hi") must throwAn[Exception]
+      parse("\"hi\"") must throwAn[Exception]
       parse("3.4") must throwAn[Exception]
       parse("true") must throwAn[Exception]
     }

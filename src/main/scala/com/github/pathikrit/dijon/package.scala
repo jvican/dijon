@@ -61,17 +61,17 @@ package object dijon {
   // TODO: better way to write this?
   //implicit def toMap(json: SomeJson): JsonObject = toScalaType(json)
   //implicit def toArray(json: SomeJson): JsonArray = toScalaType(json)
-  implicit def toString(json: SomeJson): String = json.underlying.asInstanceOf[String]
-  implicit def toInt(json: SomeJson): Int = json.underlying.asInstanceOf[Int]
-  implicit def toDouble(json: SomeJson): Double = json.underlying.asInstanceOf[Double]
-  implicit def toBoolean(json: SomeJson): Boolean = json.underlying.asInstanceOf[Boolean]
+  implicit val `SomeJson -> String` = toScalaType[String] _
+  implicit val `SomeJson -> Int` = toScalaType[Int] _
+  implicit val `SomeJson -> Double` = toScalaType[Double] _
+  implicit val `SomeJson -> Boolean` = toScalaType[Boolean] _
 
   def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble).get
 
   def assemble(s: Any): SomeJson = s match {
     case null => null
     case x: Map[String, Any] => mutable.Map((x mapValues assemble).toSeq: _*)
-    case x: Seq[Any] => val buffer: SomeJson = mutable.Buffer[SomeJson](x map assemble: _*); buffer
+    case x: Seq[Any] => mutable.Buffer[SomeJson](x map assemble: _*)
     case x: String => x
     case x: Int => x
     case x: Double => x
