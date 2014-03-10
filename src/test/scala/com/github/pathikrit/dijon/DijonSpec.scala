@@ -84,7 +84,7 @@ class DijonSpec extends Specification {
     }
 
     "parse arrays" in {
-      val empty = json("[]")
+      val empty = parse("[]")
       empty(0) mustEqual None
 
       val arr = json"""[1, true, null, "hi", {"key": "value"}]"""
@@ -108,11 +108,11 @@ class DijonSpec extends Specification {
     }
 
     "not parse primitives" in {
-      json("23") must throwAn[Exception]
-      json("hi") must throwAn[Exception]
-      json("\"hi\"") must throwAn[Exception]
-      json("3.4") must throwAn[Exception]
-      json("true") must throwAn[Exception]
+      parse("23") must throwAn[Exception]
+      parse("hi") must throwAn[Exception]
+      parse("\"hi\"") must throwAn[Exception]
+      parse("3.4") must throwAn[Exception]
+      parse("true") must throwAn[Exception]
     }
 
     "parse empty object" in {

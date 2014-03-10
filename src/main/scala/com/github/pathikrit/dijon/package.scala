@@ -66,7 +66,7 @@ package object dijon {
   implicit val `SomeJson -> Double` = toScalaType[Double] _
   implicit val `SomeJson -> Boolean` = toScalaType[Boolean] _
 
-  def json(s: String): SomeJson = (JSON.parseFull(s) map assemble).get
+  def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble).get
 
   def assemble(s: Any): SomeJson = s match {
     case null => null
@@ -79,7 +79,7 @@ package object dijon {
   }
 
   implicit class JsonStringContext(val sc: StringContext) extends AnyVal {
-    def json(args: Any*): SomeJson = json(sc.s(args: _*))
+    def json(args: Any*): SomeJson = parse(sc.s(args: _*))
   }
 
   // TODO: do Union types using Curry-Howard: http://www.chuusai.com/2011/06/09/scala-union-types-curry-howard/
