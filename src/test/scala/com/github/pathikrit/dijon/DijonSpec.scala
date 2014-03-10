@@ -197,5 +197,16 @@ class DijonSpec extends Specification {
       obj.toString mustEqual "{}"
       obj mustEqual `{}`
     }
+
+    "tolerate special symbols" in {
+      val json = json"""{ "★": 23 }"""
+      json.★ mustEqual 23
+      json.★ mustNotEqual "23"
+      json.★ = "23"
+      json.★ mustEqual "23"
+      json.`+` = true
+      json.`+` mustEqual true
+      json.`+` mustNotEqual "true"
+    }
   }
 }
