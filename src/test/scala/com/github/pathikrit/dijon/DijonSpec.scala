@@ -1,13 +1,13 @@
 package com.github.pathikrit.dijon
 
-import com.github.pathikrit.dijon.Json._
+import com.github.pathikrit.dijon._
 import com.github.pathikrit.dijon.DisjointType._
 
 import org.specs2.mutable.Specification
 
-class JsonSpec extends Specification {
+class DijonSpec extends Specification {
 
-  "yasjl" should {
+  "dijon" should {
 
     val (email1, email2) = ("pathikritbhowmick@msn.com", "pathikrit.bhowmick@gmail.com")
     val (name, age) = ("Rick", 27)

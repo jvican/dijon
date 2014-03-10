@@ -1,10 +1,10 @@
-package com.github.pathikrit.dijon
+package com.github.pathikrit
 
 import scala.collection.mutable
 import scala.util.parsing.json.{JSON, JSONObject}
-import DisjointType._
 
-object Json extends App {
+package object dijon extends App {
+  import DisjointType._
 
   type JsonTypes = (String v Int v Double v Boolean v Null v JsonArray v JsonObject v None.type)
   type ValidJsonType[A] = A => JsonTypes

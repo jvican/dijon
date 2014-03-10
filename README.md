@@ -3,14 +3,21 @@
 dijon - Dynamic Json in Scala
 =====
 * Boiler-free json handling using Scala [Dynamic Types](http://www.scala-lang.org/api/2.10.3/index.html#scala.Dynamic)
+* Type-safe through [union types](src/main/scala/com/github/pathikrit/dijon/DisjointType.scala)
+```scala
+val test = JsonObject
+test.aString = "hi"     // compiles
+test.aBoolean = true    // compiles
+test.anInt = 23         // compiles
+test.`null` = null      // compiles
+// test.somethingElse = Set.empty[String]  // does not compile
+```
 * No external [dependencies](build.sbt)
-* Less than [100 lines](src/main/scala/com/github/pathikrit/dijon/Json.scala) of code
+* Less than [100 lines](src/main/scala/com/github/pathikrit/dijon/package.scala) of code
 * Well [tested][1]
 * Why yet another Scala json library? Well, code speaks more than thousand words:
 
 ```scala
-import com.github.pathikrit.dijon.Json._
-
 val (name, age) = ("Tigri", 7)
 val cat = json"""
 {
@@ -48,4 +55,4 @@ println(cat)
 See the [spec][1] for more examples.
 
 
-[1]: src/test/scala/com/github/pathikrit/dijon/JsonSpec.scala
+[1]: src/test/scala/com/github/pathikrit/dijon/DijonSpec.scala
