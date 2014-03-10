@@ -1,6 +1,7 @@
 package com.github.pathikrit.dijon
 
 import org.specs2.mutable.Specification
+import scala.collection.mutable
 
 class DijonSpec extends Specification {
 
@@ -133,7 +134,7 @@ class DijonSpec extends Specification {
       assert(cat.name == name)
 
       assert(cat.age == age)
-      val catAge: Double = cat.age
+      val catAge: Double = cat.age      // type inference
       cat.age = catAge + 1
       assert(cat.age == 8)
 
@@ -141,8 +142,12 @@ class DijonSpec extends Specification {
       assert(cat.`is cat` == true)
       assert(cat.email == None)
 
-      val vet = `{}`
+      val vet = `{}`        // create empty json object
       vet.name = "Dr. Kitty Specialist"
+      vet.phones = `[]`     // create empty json array
+      vet.phones(2) = "(650) 493-4233"                // set the 3rd item in array to this phone
+      assert(vet.phones == mutable.Seq(null, null, "(650) 493-4233")) // first 2 entries null
+
       vet.address = `{}`
       vet.address.name = "Silicon Valley Animal Hospital"
       vet.address.city = "Palo Alto"
@@ -152,7 +157,7 @@ class DijonSpec extends Specification {
       assert(cat.vet.address.zip == 94306)
 
       println(cat)
-      //{"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Silicon Valley Animal Hospital"}, "name" : "Dr. Kitty Specialist"}, "is cat" : true, "age" : 7.0}
+      //{"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Silicon Valley Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 8.0}
 
       ok
     }
