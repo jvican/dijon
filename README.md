@@ -102,7 +102,6 @@ TODO
 ====
 * Circular references checker
 * Pretty printer
-* Json merger
 
 
 [1]: src/test/scala/com/github/pathikrit/dijon/DijonSpec.scala

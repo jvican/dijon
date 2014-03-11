@@ -271,8 +271,18 @@ class DijonSpec extends Specification {
       json.selectDynamic("+") mustNotEqual "true"
     }
 
-    "take rhs for non-objects" in {
-      todo
+    "do merges for non-objects" in {
+      val json = json"""{ "key": ["w"]}"""
+      `{}` + json mustEqual json
+      json + `{}` mustEqual json
+      `[]` + json mustEqual json
+      json + `[]` mustEqual `[]`
+      json + json mustEqual json
+      json + true mustEqual true
+      json + 20 mustEqual 20
+      20 + json mustEqual json
+      json + "hi" mustEqual "hi"
+      //"hi" + json mustEqual json
     }
   }
 }
