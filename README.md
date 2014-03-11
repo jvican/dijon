@@ -26,7 +26,7 @@ assert(cat.age == age + 1)
 
 assert(cat.hobbies(1) == "purring")
 assert(cat.hobbies(100) == None)    // missing element
-assert(cat.`is cat` == true)        // keys with spaces/symbols/scala-keywords need to be escaped with ticks
+assert(cat.`is cat` == true)        // keys with spaces/scala-keywords need to be escaped
 assert(cat.email == None)           // missing key
 
 val vet = `{}`                      // create empty json object
@@ -52,8 +52,36 @@ println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"
 assert(cat == parse(cat.toString))   // round-trip test
 
 var basicCat = cat - "vet"                              // remove 1 key
-basicCat = basicCat - ("hobbies", "is cat", "paws")    // remove multiple keys - note paws is not actually in cat
-assert(basicCat == parse("""{ "name": "Tigri", "age": 8}"""))   // after dropping some keys above
+basicCat = basicCat - ("hobbies", "is cat", "paws")    // remove multiple keys ("paws" is not in cat)
+assert(basicCat == json"""{ "name": "Tigri", "age": 8}""")   // after dropping some keys above
+```
+
+* Simple deep-merging:
+```scala
+val scala = json"""
+{
+  "name": "scala",
+  "version": "2.10.3",
+  "features": {
+    "functional": true,
+    "awesome": true
+  }
+}
+"""
+
+val java = json"""
+{
+  "name": "java",
+  "features": {
+    "functional": [0, 0],
+    "terrible": true
+  },
+  "bugs": 213
+}
+"""
+
+assert((scala + java) == json"""{"name": "java", "version": "2.10.3", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
+assert((java + scala) == json"""{"name": "scala", "version": "2.10.3", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
 ```
 
 * [Union types](src/main/scala/com/github/pathikrit/dijon/UnionType.scala) for [type-safety](src/main/scala/com/github/pathikrit/dijon/package.scala#L10):

@@ -123,7 +123,7 @@ class DijonSpec extends Specification {
       arr.keys mustEqual None
     }
 
-    "work for example 1" in {
+    "handle json upates" in {
       val (name, age) = ("Tigri", 7)
       val cat = json"""
         {
@@ -167,13 +167,41 @@ class DijonSpec extends Specification {
       assert(cat == parse(cat.toString))   // round-trip test
 
       var basicCat = cat - "vet"                              // remove 1 key
-      basicCat = basicCat - ("hobbies", "is cat", "paws")    // remove multiple keys - note paws is not actually in cat
-      assert(basicCat == parse("""{ "name": "Tigri", "age": 8}"""))   // after dropping some keys above
+      basicCat = basicCat - ("hobbies", "is cat", "paws")    // remove multiple keys ("paws" is not in cat)
+      assert(basicCat == json"""{ "name": "Tigri", "age": 8}""")   // after dropping some keys above
 
       ok
     }
 
-    "work for example 2" in {
+    "handle merges" in {
+      val scala = json"""
+        {
+          "name": "scala",
+          "version": "2.10.3",
+          "features": {
+            "functional": true,
+            "awesome": true
+          }
+        }
+      """
+
+      val java = json"""
+        {
+          "name": "java",
+          "features": {
+            "functional": [0, 0],
+            "terrible": true
+          },
+          "bugs": 213
+        }
+      """
+
+      assert((scala + java) == json"""{"name": "java", "version": "2.10.3", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
+      assert((java + scala) == json"""{"name": "scala", "version": "2.10.3", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
+      ok
+    }
+
+    "be type-safeish" in {
       val json = `{}`
       json.aString = "hi"                        // compiles
       json.aBoolean = true                       // compiles
@@ -241,6 +269,10 @@ class DijonSpec extends Specification {
       json.updateDynamic("+")(true)               //sometimes we have to resort to this json.+ won't compile
       json.selectDynamic("+") mustEqual true
       json.selectDynamic("+") mustNotEqual "true"
+    }
+
+    "take rhs for non-objects" in {
+      todo
     }
   }
 }
