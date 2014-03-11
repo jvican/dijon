@@ -166,9 +166,9 @@ class DijonSpec extends Specification {
       println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 8.0}
       assert(cat == parse(cat.toString))   // round-trip test
 
-      cat -= "vet"                            // remove 1 key
-      cat -= ("hobbies", "is cat", "paws")    // remove multiple keys - note paws is not actually in cat
-      assert(cat == parse("""{ "name": "Tigri", "age": 8}"""))   // after dropping some keys above
+      var basicCat = cat - "vet"                              // remove 1 key
+      basicCat = basicCat - ("hobbies", "is cat", "paws")    // remove multiple keys - note paws is not actually in cat
+      assert(basicCat == parse("""{ "name": "Tigri", "age": 8}"""))   // after dropping some keys above
 
       ok
     }
@@ -193,8 +193,8 @@ class DijonSpec extends Specification {
       langs(5) mustEqual "F#"
       langs(1)(3) = "python4"
       langs(1)(3) mustEqual "python4"
-      langs(1)(100) -= "foo"
-      langs(1)(-1)(-20)(-39) -= "foo"
+      (langs(1)(100) - "foo") mustEqual None
+      (langs(1)(-1)(-20)(-39) - "foo") mustEqual None
       langs(3) = `{}`
       langs(3).java = "sux"
       langs.toString mustEqual """["scala", ["python2", "python3", null, "python4"], null, {"java" : "sux"}, null, "F#"]"""
@@ -228,7 +228,7 @@ class DijonSpec extends Specification {
       val obj = json"{}"
       obj.toString mustEqual "{}"
       obj mustEqual `{}`
-      obj -= ("foo", "bar")
+      (obj - ("foo", "bar")) mustEqual parse("{}")
       obj.keys mustEqual Some(Set.empty[String])
     }
 

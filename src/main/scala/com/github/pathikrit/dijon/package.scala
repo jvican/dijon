@@ -47,9 +47,9 @@ package object dijon {
       case _ => None
     }
 
-    def -=(keys: String*): Unit = underlying match {
-      case obj: JsonObject => obj --= keys
-      case _ =>
+    def -(keys: String*): SomeJson = underlying match {
+      case obj: JsonObject => obj -- keys
+      case _ => this
     }
 
     override def toString = underlying match {
