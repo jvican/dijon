@@ -44,6 +44,7 @@ assert(vet.address == mutable.Map("name" -> "Animal Hospital", "city" -> "Palo A
 
 cat.vet = vet                        // json setter
 assert(cat.keys == Some(Set("name", "age", "hobbies", "is cat", "vet")))    // get all keys
+assert(cat.vet.keys == Some(Set("name", "phones", "address")))
 assert(cat.vet.phones(2) == phone)
 assert(cat.vet.address.zip == 94306)
 
@@ -69,13 +70,11 @@ val j: Int = json.aBoolean                 // run-time exception
 
 See the [spec][1] for more examples.
 
-
 TODO
 ====
 * Circular references checker
 * Pretty printer
-* Better parse errors + more test cases for invalid JSONs
-* Pluggable custom types e.g. BigDecimal and Date
+* Json merger
 
 
 [1]: src/test/scala/com/github/pathikrit/dijon/DijonSpec.scala

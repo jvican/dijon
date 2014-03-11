@@ -74,7 +74,7 @@ package object dijon {
   implicit val `SomeJson -> Double` = toUnderlying[Double]
   implicit val `SomeJson -> Boolean` = toUnderlying[Boolean]
 
-  def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble).get
+  def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble) getOrElse (throw new IllegalArgumentException("Could not convert to JSON"))
 
   def assemble(s: Any): SomeJson = s match {
     case null => null

@@ -159,6 +159,7 @@ class DijonSpec extends Specification {
 
       cat.vet = vet                        // json setter
       assert(cat.keys == Some(Set("name", "age", "hobbies", "is cat", "vet")))    // get all keys
+      assert(cat.vet.keys == Some(Set("name", "phones", "address")))
       assert(cat.vet.phones(2) == phone)
       assert(cat.vet.address.zip == 94306)
 
@@ -200,12 +201,27 @@ class DijonSpec extends Specification {
       langs mustEqual parse(langs.toString)
     }
 
-    "not parse primitives" in {
-      parse("23") must throwAn[Exception]
-      parse("hi") must throwAn[Exception]
-      parse("\"hi\"") must throwAn[Exception]
-      parse("3.4") must throwAn[Exception]
-      parse("true") must throwAn[Exception]
+    "not parse invalid jsons" in {
+      val tests = Seq(
+        "23",
+        "hi",
+        "\"hi\"",
+        "3.4",
+        "true",
+        "",
+        "null",
+        "\"null\"",
+        "{}}",
+        "[[]",
+        "{key: 98}",
+        "{\"key\": 98\"}"
+      )
+
+      examplesBlock {
+        for (str <- tests) {
+          parse(str) must throwAn[IllegalArgumentException]
+        }
+      }
     }
 
     "parse empty object" in {
