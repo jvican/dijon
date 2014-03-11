@@ -42,11 +42,6 @@ package object dijon {
       case _ =>
     }
 
-    def keys: Option[Set[String]] = underlying match {
-      case obj: JsonObject => Some(obj.keySet.toSet)
-      case _ => None
-    }
-
     def ++(that: SomeJson): SomeJson = (this.underlying, that.underlying) match {
       case (a: JsonObject, b: JsonObject) =>
         val res = a.clone()
@@ -63,6 +58,14 @@ package object dijon {
       case _ => this
     }
 
+    def as[T : JsonType]: Option[T] = scala.util.Try(underlying.asInstanceOf[T]) match {
+      case scala.util.Success(res) => Some(res)  // TODO: use typeOf[T] =:= typeOf[A]
+      case _  => None
+    }
+
+    def toMap: Map[String, SomeJson] = (as[JsonObject] getOrElse Map.empty).toMap
+    def toSeq: Seq[SomeJson] = (as[JsonArray] getOrElse Seq.empty).toSeq
+
     override def toString = underlying match {
       case obj: JsonObject => new JSONObject(obj.toMap).toString
       case arr: JsonArray => arr mkString ("[", ", ", "]")
@@ -77,13 +80,6 @@ package object dijon {
 
     override def hashCode = underlying.hashCode
   }
-
-  implicit def toUnderlying[A : JsonType] = (json: SomeJson) => json.underlying.asInstanceOf[A]
-  // TODO: better way to write this?
-  implicit val `SomeJson -> String` = toUnderlying[String]
-  implicit val `SomeJson -> Int` = toUnderlying[Int]
-  implicit val `SomeJson -> Double` = toUnderlying[Double]
-  implicit val `SomeJson -> Boolean` = toUnderlying[Boolean]
 
   def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble) getOrElse (throw new IllegalArgumentException("Could not convert to JSON"))
 

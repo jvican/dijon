@@ -19,14 +19,15 @@ val cat = json"""
   }
 """
 assert(cat.name == name)            // dynamic type
+assert(cat.age == age)
+assert(cat.age.as[Double] == Some(age)) // type inference
 
-val catAge: Double = cat.age        // type inference
-cat.age = catAge + 1
-assert(cat.age == age + 1)
+val catMap = cat.toMap     // view as a hashmap
+assert(catMap.keySet == Set("name", "age", "hobbies", "is cat"))
 
 assert(cat.hobbies(1) == "purring")
 assert(cat.hobbies(100) == None)    // missing element
-assert(cat.`is cat` == true)        // keys with spaces/scala-keywords need to be escaped
+assert(cat.`is cat` == true)        // keys with spaces/symbols/scala-keywords need to be escaped with ticks
 assert(cat.email == None)           // missing key
 
 val vet = `{}`                      // create empty json object
@@ -43,17 +44,17 @@ vet.address.zip = 94306
 assert(vet.address == mutable.Map("name" -> "Animal Hospital", "city" -> "Palo Alto", "zip" -> 94306))
 
 cat.vet = vet                        // json setter
-assert(cat.keys == Some(Set("name", "age", "hobbies", "is cat", "vet")))    // get all keys
-assert(cat.vet.keys == Some(Set("name", "phones", "address")))
 assert(cat.vet.phones(2) == phone)
 assert(cat.vet.address.zip == 94306)
 
-println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 8.0}
+println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 7.0}
 assert(cat == parse(cat.toString))   // round-trip test
 
 var basicCat = cat -- "vet"                              // remove 1 key
 basicCat = basicCat -- ("hobbies", "is cat", "paws")    // remove multiple keys ("paws" is not in cat)
-assert(basicCat == json"""{ "name": "Tigri", "age": 8}""")   // after dropping some keys above
+assert(basicCat == json"""{ "name": "Tigri", "age": 7}""")   // after dropping some keys above
+
+(cat.vet.address -- "city") mustEqual json"""{ "name" : "Animal Hospital", "zip": 94306}"""
 ```
 
 * Simple deep-merging:
@@ -90,21 +91,21 @@ val json = `{}`
 json.aString = "hi"                        // compiles
 json.aBoolean = true                       // compiles
 json.anInt = 23                            // compiles
-// test.somethingElse = Some("hi")         // does not compile
-val i: Int = json.anInt
+// test.somethingElse = Option("hi")       // does not compile
+val Some(i: Int) = json.anInt.as[Int]
 assert(i == 23)
-val j: Int = json.aBoolean                 // run-time exception
+val j: Int = json.aBoolean    // run-time exception
 ```
 
 See the [spec][1] for more examples.
 
-sbt
+Usage
 ===
 Add the following to your `build.sbt` to use `dijon`:
 ```scala
 resolvers += "Sonatype releases" at "http://oss.sonatype.org/content/repositories/releases/"
 
-libraryDependency += "com.github.pathikrit" %% "dijon" % "0.1.0"
+libraryDependency += "com.github.pathikrit" %% "dijon" % "0.1.1"
 ```
 
 TODO

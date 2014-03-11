@@ -32,7 +32,7 @@ class DijonSpec extends Specification {
            ["coding", ["python", "scala"]],
            null
           ],
-          "keys": [23, 345, true]
+          "toMap": [23, 345, true]
        }
      """
 
@@ -87,8 +87,8 @@ class DijonSpec extends Specification {
       rick.hobbies(4) mustNotEqual null
       rick.hobbies(4) mustEqual None
 
-      rick.keys mustEqual Some(Set("name", "age", "class", "contact", "is online", "weight", "hobbies", "keys"))
-      rick.selectDynamic("keys")(1) mustEqual 345
+      rick.toMap.keySet mustEqual Set("name", "age", "class", "contact", "is online", "weight", "hobbies", "toMap")
+      rick.selectDynamic("toMap")(1) mustEqual 345
       rick mustEqual parse(rick.toString) // round-trip test
 
     }
@@ -102,16 +102,16 @@ class DijonSpec extends Specification {
       val arr = json"""[1, true, null, "hi", {"key": "value"}]"""
       arr mustEqual parse(arr.toString)
 
-      val i: Double = arr(0)
+      val Some(i: Double) = arr(0).as[Double]
       i mustEqual 1
 
-      val b: Boolean = arr(1)
+      val Some(b: Boolean) = arr(1).as[Boolean]
       b must beTrue
 
       val n = arr(2)
       assert(n == null)
 
-      val s: String = arr(3)
+      val Some(s: String) = arr(3).as[String]
       s mustEqual "hi"
 
       //val m: Map[String, SomeJson] = arr(4)
@@ -120,7 +120,8 @@ class DijonSpec extends Specification {
       //val u: None.type = arr(5)
       //u must beNone
 
-      arr.keys mustEqual None
+      //arr.toMap mustEqual Map.empty
+      arr.toSeq must have size 5
     }
 
     "handle json upates" in {
@@ -135,9 +136,11 @@ class DijonSpec extends Specification {
       """
       assert(cat.name == name)            // dynamic type
 
-      val catAge: Double = cat.age        // type inference
-      cat.age = catAge + 1
-      assert(cat.age == age + 1)
+      assert(cat.age.as[Double] == Some(age)) // type inference
+      //assert(cat.age.as[Boolean] == None)
+
+      val catMap = cat.toMap     // view as a hashmap
+      assert(catMap.keySet == Set("name", "age", "hobbies", "is cat"))
 
       assert(cat.hobbies(1) == "purring")
       assert(cat.hobbies(100) == None)    // missing element
@@ -158,17 +161,15 @@ class DijonSpec extends Specification {
       assert(vet.address == mutable.Map("name" -> "Animal Hospital", "city" -> "Palo Alto", "zip" -> 94306))
 
       cat.vet = vet                        // json setter
-      assert(cat.keys == Some(Set("name", "age", "hobbies", "is cat", "vet")))    // get all keys
-      assert(cat.vet.keys == Some(Set("name", "phones", "address")))
       assert(cat.vet.phones(2) == phone)
       assert(cat.vet.address.zip == 94306)
 
-      println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 8.0}
+      println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 7.0}
       assert(cat == parse(cat.toString))   // round-trip test
 
       var basicCat = cat -- "vet"                              // remove 1 key
       basicCat = basicCat -- ("hobbies", "is cat", "paws")    // remove multiple keys ("paws" is not in cat)
-      assert(basicCat == json"""{ "name": "Tigri", "age": 8}""")   // after dropping some keys above
+      assert(basicCat == json"""{ "name": "Tigri", "age": 7}""")   // after dropping some keys above
 
       (cat.vet.address -- "city") mustEqual json"""{ "name" : "Animal Hospital", "zip": 94306}"""
     }
@@ -209,7 +210,7 @@ class DijonSpec extends Specification {
       json.aBoolean = true                       // compiles
       json.anInt = 23                            // compiles
       // test.somethingElse = Option("hi")       // does not compile
-      val i: Int = json.anInt
+      val Some(i: Int) = json.anInt.as[Int]
       assert(i == 23)
       //val j: Int = json.aBoolean    // run-time exception
       ok
@@ -259,7 +260,7 @@ class DijonSpec extends Specification {
       obj.toString mustEqual "{}"
       obj mustEqual `{}`
       (obj -- ("foo", "bar")) mustEqual parse("{}")
-      obj.keys mustEqual Some(Set.empty[String])
+      obj.toMap mustEqual Map.empty
     }
 
     "tolerate special symbols" in {
