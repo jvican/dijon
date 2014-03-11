@@ -47,18 +47,18 @@ package object dijon {
       case _ => None
     }
 
-    def +(that: SomeJson): SomeJson = (this.underlying, that.underlying) match {
+    def ++(that: SomeJson): SomeJson = (this.underlying, that.underlying) match {
       case (a: JsonObject, b: JsonObject) =>
         val res = a.clone()
         b.keys foreach {
-          case key if res contains key => res(key) = res(key) + b(key)
+          case key if res contains key => res(key) = res(key) ++ b(key)
           case key => res(key) = b(key)
         }
         res
       case _ => that
     }
 
-    def -(keys: String*): SomeJson = underlying match {
+    def --(keys: String*): SomeJson = underlying match {
       case obj: JsonObject => obj -- keys
       case _ => this
     }

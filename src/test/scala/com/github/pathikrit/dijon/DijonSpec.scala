@@ -166,8 +166,8 @@ class DijonSpec extends Specification {
       println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 8.0}
       assert(cat == parse(cat.toString))   // round-trip test
 
-      var basicCat = cat - "vet"                              // remove 1 key
-      basicCat = basicCat - ("hobbies", "is cat", "paws")    // remove multiple keys ("paws" is not in cat)
+      var basicCat = cat -- "vet"                              // remove 1 key
+      basicCat = basicCat -- ("hobbies", "is cat", "paws")    // remove multiple keys ("paws" is not in cat)
       assert(basicCat == json"""{ "name": "Tigri", "age": 8}""")   // after dropping some keys above
 
       ok
@@ -196,8 +196,8 @@ class DijonSpec extends Specification {
         }
       """
 
-      assert((scala + java) == json"""{"name": "java", "version": "2.10.3", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
-      assert((java + scala) == json"""{"name": "scala", "version": "2.10.3", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
+      assert((scala ++ java) == json"""{"name": "java", "version": "2.10.3", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
+      assert((java ++ scala) == json"""{"name": "scala", "version": "2.10.3", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
       ok
     }
 
@@ -221,8 +221,8 @@ class DijonSpec extends Specification {
       langs(5) mustEqual "F#"
       langs(1)(3) = "python4"
       langs(1)(3) mustEqual "python4"
-      (langs(1)(100) - "foo") mustEqual None
-      (langs(1)(-1)(-20)(-39) - "foo") mustEqual None
+      (langs(1)(100) -- "foo") mustEqual None
+      (langs(1)(-1)(-20)(-39) -- "foo") mustEqual None
       langs(3) = `{}`
       langs(3).java = "sux"
       langs.toString mustEqual """["scala", ["python2", "python3", null, "python4"], null, {"java" : "sux"}, null, "F#"]"""
@@ -256,7 +256,7 @@ class DijonSpec extends Specification {
       val obj = json"{}"
       obj.toString mustEqual "{}"
       obj mustEqual `{}`
-      (obj - ("foo", "bar")) mustEqual parse("{}")
+      (obj -- ("foo", "bar")) mustEqual parse("{}")
       obj.keys mustEqual Some(Set.empty[String])
     }
 
@@ -273,16 +273,16 @@ class DijonSpec extends Specification {
 
     "do merges for non-objects" in {
       val json = json"""{ "key": ["w"]}"""
-      `{}` + json mustEqual json
-      json + `{}` mustEqual json
-      `[]` + json mustEqual json
-      json + `[]` mustEqual `[]`
-      json + json mustEqual json
-      json + true mustEqual true
-      json + 20 mustEqual 20
-      20 + json mustEqual json
-      json + "hi" mustEqual "hi"
-      //"hi" + json mustEqual json
+      `{}` ++ json mustEqual json
+      json ++ `{}` mustEqual json
+      `[]` ++ json mustEqual json
+      json ++ `[]` mustEqual `[]`
+      json ++ json mustEqual json
+      json ++ true mustEqual true
+      json ++ 20 mustEqual 20
+      20 ++ json mustEqual json
+      json ++ "hi" mustEqual "hi"
+      //"hi" ++ json mustEqual json
     }
   }
 }

@@ -51,8 +51,8 @@ assert(cat.vet.address.zip == 94306)
 println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 8.0}
 assert(cat == parse(cat.toString))   // round-trip test
 
-var basicCat = cat - "vet"                              // remove 1 key
-basicCat = basicCat - ("hobbies", "is cat", "paws")    // remove multiple keys ("paws" is not in cat)
+var basicCat = cat -- "vet"                              // remove 1 key
+basicCat = basicCat -- ("hobbies", "is cat", "paws")    // remove multiple keys ("paws" is not in cat)
 assert(basicCat == json"""{ "name": "Tigri", "age": 8}""")   // after dropping some keys above
 ```
 
@@ -80,8 +80,8 @@ val java = json"""
 }
 """
 
-assert((scala + java) == json"""{"name": "java", "version": "2.10.3", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
-assert((java + scala) == json"""{"name": "scala", "version": "2.10.3", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
+assert((scala ++ java) == json"""{"name": "java", "version": "2.10.3", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
+assert((java ++ scala) == json"""{"name": "scala", "version": "2.10.3", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
 ```
 
 * [Union types](src/main/scala/com/github/pathikrit/dijon/UnionType.scala) for [type-safety](src/main/scala/com/github/pathikrit/dijon/package.scala#L10):
