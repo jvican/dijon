@@ -42,6 +42,16 @@ package object dijon {
       case _ =>
     }
 
+    def keys: Option[Set[String]] = underlying match {
+      case obj: JsonObject => Some(obj.keySet.toSet)
+      case _ => None
+    }
+
+    def -=(keys: String*): Unit = underlying match {
+      case obj: JsonObject => obj --= keys
+      case _ =>
+    }
+
     override def toString = underlying match {
       case obj: JsonObject => new JSONObject(obj.toMap).toString
       case arr: JsonArray => arr mkString ("[", ", ", "]")
@@ -55,11 +65,6 @@ package object dijon {
     })
 
     override def hashCode = underlying.hashCode
-
-    def keys: Option[Set[String]] = underlying match {
-      case obj: JsonObject => Some(obj.keySet.toSet)
-      case _ => None
-    }
   }
 
   implicit def toUnderlying[A : JsonType] = (json: SomeJson) => json.underlying.asInstanceOf[A]
@@ -73,8 +78,8 @@ package object dijon {
 
   def assemble(s: Any): SomeJson = s match {
     case null => null
-    case x: Map[String, Any] => mutable.Map((x mapValues assemble).toSeq: _*)
-    case x: Seq[Any] => mutable.Buffer[SomeJson](x map assemble: _*)
+    case x: Map[String, Any] => mutable.Map((x mapValues assemble).toSeq : _*)
+    case x: Seq[Any] => mutable.Buffer[SomeJson](x map assemble : _*)
     case x: String => x
     case x: Int => x
     case x: Double => x
