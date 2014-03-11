@@ -98,6 +98,15 @@ val j: Int = json.aBoolean                 // run-time exception
 
 See the [spec][1] for more examples.
 
+sbt
+===
+Add the following to your `build.sbt` to use `dijon`:
+```scala
+resolvers += "Sonatype releases" at "http://oss.sonatype.org/content/repositories/releases/"
+
+libraryDependency += "com.github.pathikrit" %% "dijon" % "0.1.0"
+```
+
 TODO
 ====
 * Circular references checker

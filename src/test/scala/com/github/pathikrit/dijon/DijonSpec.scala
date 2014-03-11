@@ -170,7 +170,7 @@ class DijonSpec extends Specification {
       basicCat = basicCat -- ("hobbies", "is cat", "paws")    // remove multiple keys ("paws" is not in cat)
       assert(basicCat == json"""{ "name": "Tigri", "age": 8}""")   // after dropping some keys above
 
-      ok
+      (cat.vet.address -- "city") mustEqual json"""{ "name" : "Animal Hospital", "zip": 94306}"""
     }
 
     "handle merges" in {
@@ -198,7 +198,9 @@ class DijonSpec extends Specification {
 
       assert((scala ++ java) == json"""{"name": "java", "version": "2.10.3", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
       assert((java ++ scala) == json"""{"name": "scala", "version": "2.10.3", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
-      ok
+
+      (scala ++ java).name mustNotEqual (java ++ scala).name
+      (scala ++ java).bugs mustEqual (java ++ scala).bugs
     }
 
     "be type-safeish" in {
