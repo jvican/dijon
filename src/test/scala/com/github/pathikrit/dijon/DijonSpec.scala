@@ -143,7 +143,7 @@ class DijonSpec extends Specification {
       val catMap = cat.toMap     // view as a hashmap
       assert(catMap.keySet == Set("name", "age", "hobbies", "is cat"))
 
-      assert(cat.hobbies(1) == "purring")
+      assert(cat.hobbies(1) == "purring") // array access
       assert(cat.hobbies(100) == None)    // missing element
       assert(cat.`is cat` == true)        // keys with spaces/symbols/scala-keywords need to be escaped with ticks
       assert(cat.email == None)           // missing key

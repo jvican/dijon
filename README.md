@@ -27,7 +27,7 @@ assert(cat.age.as[Boolean] == None)
 val catMap = cat.toMap     // view as a hashmap
 assert(catMap.keySet == Set("name", "age", "hobbies", "is cat"))
 
-assert(cat.hobbies(1) == "purring")
+assert(cat.hobbies(1) == "purring") // array access
 assert(cat.hobbies(100) == None)    // missing element
 assert(cat.`is cat` == true)        // keys with spaces/symbols/scala-keywords need to be escaped with ticks
 assert(cat.email == None)           // missing key
@@ -112,7 +112,8 @@ TODO
 ====
 * Circular references checker
 * Pretty printer
-* `json` interpolator parses YAML-like syntax too
-* Make type inference a macro to fail during compile time
+* JSON string interpolator fills in braces, quotes and commas etc
+* YAML interpolator
+* Macro for type inference to induce compile-time errors where possible
 
 [1]: src/test/scala/com/github/pathikrit/dijon/DijonSpec.scala
