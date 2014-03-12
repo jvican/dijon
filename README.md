@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/pathikrit/dijon.png)](http://travis-ci.org/pathikrit/dijon)
+[![Build Status](https://travis-ci.org/pathikrit/dijon.png?branch=master)](http://travis-ci.org/pathikrit/dijon)
 
 dijon - Dynamic Json in Scala
 =====
