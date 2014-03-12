@@ -20,7 +20,9 @@ val cat = json"""
 """
 assert(cat.name == name)            // dynamic type
 assert(cat.age == age)
-assert(cat.age.as[Double] == Some(age)) // type inference
+val Some(catAge: Double) = cat.age.as[Double]    // type inference
+assert(catAge == age)
+assert(cat.age.as[Boolean] == None)
 
 val catMap = cat.toMap     // view as a hashmap
 assert(catMap.keySet == Set("name", "age", "hobbies", "is cat"))
@@ -53,8 +55,6 @@ assert(cat == parse(cat.toString))   // round-trip test
 var basicCat = cat -- "vet"                              // remove 1 key
 basicCat = basicCat -- ("hobbies", "is cat", "paws")    // remove multiple keys ("paws" is not in cat)
 assert(basicCat == json"""{ "name": "Tigri", "age": 7}""")   // after dropping some keys above
-
-(cat.vet.address -- "city") mustEqual json"""{ "name" : "Animal Hospital", "zip": 94306}"""
 ```
 
 * Simple deep-merging:
@@ -85,7 +85,7 @@ assert((scala ++ java) == json"""{"name": "java", "version": "2.10.3", "features
 assert((java ++ scala) == json"""{"name": "scala", "version": "2.10.3", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
 ```
 
-* [Union types](src/main/scala/com/github/pathikrit/dijon/UnionType.scala) for [type-safety](src/main/scala/com/github/pathikrit/dijon/package.scala#L10):
+* [Union types](src/main/scala/com/github/pathikrit/dijon/UnionType.scala) for [type-safety](src/main/scala/com/github/pathikrit/dijon/package.scala#L11):
 ```scala
 val json = `{}`
 json.aString = "hi"                        // compiles
@@ -94,7 +94,7 @@ json.anInt = 23                            // compiles
 // test.somethingElse = Option("hi")       // does not compile
 val Some(i: Int) = json.anInt.as[Int]
 assert(i == 23)
-val j: Int = json.aBoolean    // run-time exception
+val j: Int = json.aBoolean.as[Int]    // run-time exception
 ```
 
 See the [spec][1] for more examples.

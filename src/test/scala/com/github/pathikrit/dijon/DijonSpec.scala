@@ -114,14 +114,14 @@ class DijonSpec extends Specification {
       val Some(s: String) = arr(3).as[String]
       s mustEqual "hi"
 
-      //val m: Map[String, SomeJson] = arr(4)
-      //m("key") mustEqual "value2"
+      val m = arr(4).toMap
+      m("key") mustEqual "value"
 
-      //val u: None.type = arr(5)
-      //u must beNone
+      val u = arr(5)
+      u mustEqual None
 
-      //arr.toMap mustEqual Map.empty
       arr.toSeq must have size 5
+      //arr.toMap mustEqual Map.empty
     }
 
     "handle json upates" in {
@@ -135,8 +135,9 @@ class DijonSpec extends Specification {
         }
       """
       assert(cat.name == name)            // dynamic type
-
-      assert(cat.age.as[Double] == Some(age)) // type inference
+      assert(cat.age == age)
+      val Some(catAge: Double) = cat.age.as[Double]    // type inference
+      assert(catAge == age)
       //assert(cat.age.as[Boolean] == None)
 
       val catMap = cat.toMap     // view as a hashmap
@@ -212,7 +213,7 @@ class DijonSpec extends Specification {
       // test.somethingElse = Option("hi")       // does not compile
       val Some(i: Int) = json.anInt.as[Int]
       assert(i == 23)
-      //val j: Int = json.aBoolean    // run-time exception
+      //val j: Int = json.aBoolean.as[Int]    // run-time exception
       ok
     }
 
