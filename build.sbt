@@ -12,8 +12,6 @@ description := "Boiler-free JSON wrangling using Scala dynamic types"
 
 scalaVersion := "2.10.3"
 
-crossScalaVersions := Seq("2.10.0", "2.10.1", "2.10.2", "2.10.3")
-
 scalacOptions ++= Seq(
   "-unchecked", "-deprecation", "-feature",
   "-language:postfixOps,implicitConversions,experimental.macros,dynamics,existentials,higherKinds"

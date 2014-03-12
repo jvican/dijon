@@ -112,6 +112,7 @@ TODO
 ====
 * Circular references checker
 * Pretty printer
-
+* `json` interpolator parses YAML-like syntax too
+* Make type inference a macro to fail during compile time
 
 [1]: src/test/scala/com/github/pathikrit/dijon/DijonSpec.scala
