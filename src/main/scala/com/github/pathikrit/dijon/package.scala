@@ -59,8 +59,8 @@ package object dijon {
       case _ => this
     }
 
-    def as[T : JsonType : ClassTag]: Option[T] = scala.util.Try(underlying.asInstanceOf[T]) match {
-      case scala.util.Success(res) => Some(res)  // TODO: use http://stackoverflow.com/questions/22341339/
+    def as[T : JsonType : ClassTag]: Option[T] = underlying match {
+      case x: T => Some(x)
       case _  => None
     }
 
