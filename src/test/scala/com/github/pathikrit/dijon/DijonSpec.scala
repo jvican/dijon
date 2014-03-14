@@ -288,5 +288,21 @@ class DijonSpec extends Specification {
       json ++ "hi" mustEqual "hi"
       //"hi" ++ json mustEqual json
     }
+
+    "ignore sets on primitives" in {
+      val jsonStr = """
+        {
+          "num": 0,
+          "arr": [0, 2, true, "hi"],
+          "bol": true
+        }
+      """
+      val test = parse(jsonStr)
+      test.num.key = 0
+      test.arr.key = true
+      test.bol.key = "true"
+
+      test mustEqual parse(jsonStr)
+    }
   }
 }
