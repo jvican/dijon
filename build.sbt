@@ -17,6 +17,12 @@ scalacOptions ++= Seq(
   "-language:postfixOps,implicitConversions,experimental.macros,dynamics,existentials,higherKinds"
 )
 
+ScoverageSbtPlugin.instrumentSettings
+
+CoverallsPlugin.coverallsSettings
+
+CoverallsPlugin.CoverallsKeys.coverallsToken := Some("m1ICpWHwSZMMvgqeKbUaRE6RFre1p3zws")
+
 libraryDependencies ++= Seq("org.specs2" %% "specs2" % "2.3.10" % "test")
 
 pomExtra := {
