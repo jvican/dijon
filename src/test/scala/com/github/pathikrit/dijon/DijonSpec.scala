@@ -304,5 +304,21 @@ class DijonSpec extends Specification {
 
       test mustEqual parse(jsonStr)
     }
+
+    "hashcode works correctly" in {
+      val map = mutable.Map.empty[SomeJson, Int]
+      val j1 = json"""{ "key" : 0 }"""
+      val j2 = json"""{ "key" : "0" }"""
+
+      map(j1) =  0
+      map(j2) = 1
+      map(`{}`) = 2
+      map(`[]`) = 3
+
+      map(j1) mustEqual 0
+      map(j2) mustEqual 1
+      map(`{}`) mustEqual 2
+      map(`[]`) mustEqual 3
+    }
   }
 }
