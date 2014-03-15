@@ -110,10 +110,11 @@ libraryDependency += "com.github.pathikrit" %% "dijon" % "0.1.1"
 
 TODO
 ====
-* Circular references checker
+* BigInt support
 * Pretty printer
-* JSON string interpolator fills in braces, quotes and commas etc
+* Circular references checker
 * YAML interpolator
 * Macro for type inference to induce compile-time errors where possible
+* JSON string interpolator fills in braces, quotes and commas etc
 
 [1]: src/test/scala/com/github/pathikrit/dijon/DijonSpec.scala

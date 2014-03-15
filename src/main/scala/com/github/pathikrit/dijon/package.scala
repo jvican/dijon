@@ -90,7 +90,7 @@ package object dijon {
     case x: Map[String, Any] => mutable.Map((x mapValues assemble).toSeq : _*)
     case x: Seq[Any] => mutable.Buffer[SomeJson](x map assemble : _*)
     case x: String => x
-    case x: Int => x
+    //case x: Int => x
     case x: Double => x
     case x: Boolean => x
   }

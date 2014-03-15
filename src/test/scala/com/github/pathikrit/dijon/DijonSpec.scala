@@ -98,7 +98,8 @@ class DijonSpec extends Specification {
       empty(0) mustEqual None
       empty mustEqual `[]`
       empty mustEqual parse(empty.toString)
-      empty.toSeq mustEqual mutable.Seq.empty
+      empty.toSeq mustEqual Seq.empty
+      empty.toMap mustEqual Map.empty
 
       val arr = json"""[1, true, null, "hi", {"key": "value"}]"""
       arr mustEqual parse(arr.toString)
@@ -307,6 +308,7 @@ class DijonSpec extends Specification {
       test.bol.key = "true"
 
       test mustEqual parse(jsonStr)
+      test.arr.toSeq mustEqual Seq(0, 2, true, "hi")
       test.num.toSeq must have size 0
       test.num.toMap must beEmpty
     }
