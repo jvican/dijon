@@ -90,7 +90,6 @@ class DijonSpec extends Specification {
       rick.toMap.keySet mustEqual Set("name", "age", "class", "contact", "is online", "weight", "hobbies", "toMap")
       rick.selectDynamic("toMap")(1) mustEqual 345
       rick mustEqual parse(rick.toString) // round-trip test
-
     }
 
     "parse arrays" in {
@@ -122,7 +121,7 @@ class DijonSpec extends Specification {
       u mustEqual None
 
       arr.toSeq must have size 5
-      //arr.toMap mustEqual Map.empty
+      arr.toMap mustEqual Map.empty
     }
 
     "handle json upates" in {
@@ -139,7 +138,7 @@ class DijonSpec extends Specification {
       assert(cat.age == age)
       val Some(catAge: Double) = cat.age.as[Double]    // type inference
       assert(catAge == age)
-      //assert(cat.age.as[Boolean] == None)
+      assert(cat.age.as[Boolean] == None)
 
       val catMap = cat.toMap                           // view as a hashmap
       assert(catMap.keySet == Set("name", "age", "hobbies", "is cat"))
