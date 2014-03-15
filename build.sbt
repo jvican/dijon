@@ -4,7 +4,7 @@ sonatypeSettings
 
 name := "dijon"
 
-version := "0.1.1"
+version := "0.1.2"
 
 organization := "com.github.pathikrit"
 
@@ -24,6 +24,8 @@ CoverallsPlugin.coverallsSettings
 CoverallsPlugin.CoverallsKeys.coverallsToken := Some("m1ICpWHwSZMMvgqeKbUaRE6RFre1p3zws")
 
 libraryDependencies ++= Seq("org.specs2" %% "specs2" % "2.3.10" % "test")
+
+libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-reflect" % _)
 
 pomExtra := {
   <url>http://github.com/pathikrit/dijon</url>

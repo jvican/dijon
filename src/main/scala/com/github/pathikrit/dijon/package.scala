@@ -1,7 +1,7 @@
 package com.github.pathikrit
 
 import scala.collection.mutable
-import scala.reflect.ClassTag
+import scala.reflect.runtime.universe._
 import scala.util.parsing.json.{JSON, JSONObject}
 
 import com.github.pathikrit.dijon.UnionType.{∨, ∅}
@@ -59,9 +59,9 @@ package object dijon {
       case _ => this
     }
 
-    def as[T : JsonType : ClassTag]: Option[T] = scala.util.Try(underlying.asInstanceOf[T]) match {
-      case scala.util.Success(res) => Some(res)  // TODO: use http://stackoverflow.com/questions/22341339/
-      case _  => None
+    def as[T : JsonType : TypeTag]: Option[T] = underlying match {
+      case x: T => Some(x)
+      case _ => None
     }
 
     def toMap: Map[String, SomeJson] = (as[JsonObject] getOrElse Map.empty).toMap
