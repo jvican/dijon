@@ -18,13 +18,13 @@ val cat = json"""
     "is cat": true
   }
 """
-assert(cat.name == name)            // dynamic type
+assert(cat.name == name)                         // dynamic type
 assert(cat.age == age)
 val Some(catAge: Double) = cat.age.as[Double]    // type inference
 assert(catAge == age)
 assert(cat.age.as[Boolean] == None)
 
-val catMap = cat.toMap     // view as a hashmap
+val catMap = cat.toMap                           // view as a hashmap
 assert(catMap.keySet == Set("name", "age", "hobbies", "is cat"))
 
 assert(cat.hobbies(1) == "purring") // array access
@@ -33,7 +33,7 @@ assert(cat.`is cat` == true)        // keys with spaces/symbols/scala-keywords n
 assert(cat.email == None)           // missing key
 
 val vet = `{}`                      // create empty json object
-vet.name = "Dr. Kitty Specialist"
+vet.name = "Dr. Kitty Specialist"   // set attributes in json object
 vet.phones = `[]`                   // create empty json array
 val phone = "(650) 493-4233"
 vet.phones(2) = phone               // set the 3rd item in array to this phone
@@ -45,15 +45,15 @@ vet.address.city = "Palo Alto"
 vet.address.zip = 94306
 assert(vet.address == mutable.Map("name" -> "Animal Hospital", "city" -> "Palo Alto", "zip" -> 94306))
 
-cat.vet = vet                        // json setter
+cat.vet = vet                            // set the cat.vet to be the vet json object we created above
 assert(cat.vet.phones(2) == phone)
-assert(cat.vet.address.zip == 94306)
+assert(cat.vet.address.zip == 94306)     // json deep access
 
 println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 7.0}
 assert(cat == parse(cat.toString))   // round-trip test
 
-var basicCat = cat -- "vet"                              // remove 1 key
-basicCat = basicCat -- ("hobbies", "is cat", "paws")    // remove multiple keys ("paws" is not in cat)
+var basicCat = cat -- "vet"                                  // remove 1 key
+basicCat = basicCat -- ("hobbies", "is cat", "paws")         // remove multiple keys ("paws" is not in cat)
 assert(basicCat == json"""{ "name": "Tigri", "age": 7}""")   // after dropping some keys above
 ```
 
