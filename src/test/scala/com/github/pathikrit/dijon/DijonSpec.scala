@@ -90,7 +90,7 @@ class DijonSpec extends Specification {
       rick.toMap.keySet mustEqual Set("name", "age", "class", "contact", "is online", "weight", "hobbies", "toMap")
       rick.selectDynamic("toMap")(1) mustEqual 345
       rick mustEqual parse(rick.toString) // round-trip test
-
+      rick.toSeq must beEmpty
     }
 
     "parse arrays" in {
@@ -122,7 +122,7 @@ class DijonSpec extends Specification {
       u mustEqual None
 
       arr.toSeq must have size 5
-      //arr.toMap mustEqual Map.empty
+      arr.toMap mustEqual Map.empty
     }
 
     "handle json upates" in {
@@ -233,6 +233,7 @@ class DijonSpec extends Specification {
       langs.toString mustEqual """["scala", ["python2", "python3", null, "python4"], null, {"java" : "sux"}, null, "F#"]"""
       langs mustEqual parse(langs.toString)
       langs(1).toSeq must have size 4
+      langs.toMap must beEmpty
     }
 
     "not parse invalid jsons" in {
@@ -264,7 +265,7 @@ class DijonSpec extends Specification {
       obj mustEqual `{}`
       (obj -- ("foo", "bar")) mustEqual parse("{}")
       obj.toMap mustEqual Map.empty
-      //obj.toSeq mustEqual Nil
+      obj.toSeq mustEqual Nil
     }
 
     "tolerate special symbols" in {
@@ -306,8 +307,8 @@ class DijonSpec extends Specification {
       test.bol.key = "true"
 
       test mustEqual parse(jsonStr)
-      //test.num.toSeq must have size 0
-      //test.num.toMap must beEmpty
+      test.num.toSeq must have size 0
+      test.num.toMap must beEmpty
     }
 
     "hashcode works correctly" in {

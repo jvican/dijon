@@ -64,8 +64,9 @@ package object dijon {
       case _ => None
     }
 
-    def toMap: Map[String, SomeJson] = (as[JsonObject] getOrElse Map.empty).toMap
-    def toSeq: Seq[SomeJson] = (as[JsonArray] getOrElse Seq.empty).toSeq
+    def toMap: Map[String, SomeJson] = safeHack(as[JsonObject].get.toMap, Map.empty[String, SomeJson])
+    def toSeq: Seq[SomeJson] = safeHack(as[JsonArray].get.toSeq, Seq.empty[SomeJson])
+    private def safeHack[T](f: => T, default: T): T = scala.util.Try(f) getOrElse default
 
     override def toString = underlying match {
       case obj: JsonObject => new JSONObject(obj.toMap).toString
