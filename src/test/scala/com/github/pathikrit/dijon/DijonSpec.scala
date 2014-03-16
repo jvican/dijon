@@ -74,6 +74,10 @@ class DijonSpec extends Specification {
       rick.hobbies(1).games.football mustEqual false
       rick.hobbies(1).games.football mustNotEqual 0
 
+      rick.hobbies(1).games.football.as[Boolean] must beSome(false)
+      //rick.hobbies(1).games.football.as[Int] must beNone
+      //rick.hobbies(1).games.foosball.as[Boolean] must beNone
+
       rick.hobbies(2)(0) mustEqual "coding"
       rick.hobbies(2)(0) mustNotEqual "cooking"
 

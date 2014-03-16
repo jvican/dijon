@@ -116,5 +116,6 @@ TODO
 * YAML interpolator
 * Macro for type inference to induce compile-time errors where possible
 * JSON string interpolator fills in braces, quotes and commas etc
+* Scala 2.11 compatibility without warnings
 
 [1]: src/test/scala/com/github/pathikrit/dijon/DijonSpec.scala

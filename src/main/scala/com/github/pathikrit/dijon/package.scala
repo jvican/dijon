@@ -90,12 +90,11 @@ package object dijon {
     case x: Map[String, Any] => mutable.Map((x mapValues assemble).toSeq : _*)
     case x: Seq[Any] => mutable.Buffer[SomeJson](x map assemble : _*)
     case x: String => x
-    //case x: Int => x
     case x: Double => x
     case x: Boolean => x
   }
 
   implicit class JsonStringContext(val sc: StringContext) extends AnyVal {
-    def json(args: Any*): SomeJson = parse(sc.s(args: _*))
+    def json(args: Any*): SomeJson = parse(sc.s(args : _*))
   }
 }
