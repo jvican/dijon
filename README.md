@@ -105,7 +105,7 @@ Add the following to your `build.sbt` to use `dijon`:
 ```scala
 resolvers += "Sonatype releases" at "http://oss.sonatype.org/content/repositories/releases/"
 
-libraryDependency += "com.github.pathikrit" %% "dijon" % "0.1.1"
+libraryDependency += "com.github.pathikrit" %% "dijon" % "0.2.2"
 ```
 
 TODO

@@ -130,14 +130,6 @@ class DijonSpec extends Specification {
       arr.toMap mustEqual Map.empty
     }
 
-    "handle multiline strings correct" in {
-      val ml = `{}`
-      ml.str = """my
-                 |multiline
-                 |string""".stripMargin
-      ml.str.toString mustEqual raw""""my\nmultiline\nstring""""
-    }
-
     "handle json upates" in {
       val (name, age) = ("Tigri", 7)
       val cat = json"""
@@ -339,6 +331,14 @@ class DijonSpec extends Specification {
       map(j2) mustEqual 1
       map(`{}`) mustEqual 2
       map(`[]`) mustEqual 3
+    }
+
+    "handle multiline strings correct" in {
+      val ml = `{}`
+      ml.str = """my
+                 |multiline
+                 |string""".stripMargin
+      ml.str.toString mustEqual raw""""my\nmultiline\nstring""""
     }
   }
 }
