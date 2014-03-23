@@ -4,7 +4,7 @@ sonatypeSettings
 
 name := "dijon"
 
-version := "0.2.2"
+version := "0.2.3"
 
 organization := "com.github.pathikrit"
 
@@ -48,4 +48,3 @@ pomExtra := {
     </developer>
   </developers>
 }
-

@@ -254,7 +254,8 @@ class DijonSpec extends Specification {
         "{}}",
         "[[]",
         "{key: 98}",
-        "{\"key\": 98\"}"
+        "{\"key\": 98\"}",
+        """ { "key": "hi""} """           //http://stackoverflow.com/questions/15637429/
       )
 
       examplesBlock {
@@ -334,11 +335,19 @@ class DijonSpec extends Specification {
     }
 
     "handle multiline strings correct" in {
-      val ml = `{}`
-      ml.str = """my
+      val obj = `{}`
+      obj.str = """my
                  |multiline
                  |string""".stripMargin
-      ml.str.toString mustEqual raw""""my\nmultiline\nstring""""
+      obj.str.toString mustEqual raw""""my\nmultiline\nstring""""
+    }
+
+    "handle quotes in string keys" in {
+      val obj = `{}`
+      obj.greet = "hi\""
+      parse(obj.toString) mustEqual obj
+      json""" { "greet": "hi\\"" } """ mustEqual obj
+      //json""" { "greet": "hi\\\"" } """ mustNotEqual obj
     }
   }
 }

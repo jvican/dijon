@@ -71,7 +71,7 @@ package object dijon {
     override def toString = underlying match {
       case obj: JsonObject => new JSONObject(obj.toMap).toString
       case arr: JsonArray => arr mkString ("[", ", ", "]")
-      case str: String => s""""$str"""".replace("\n", raw"\n")
+      case str: String => s""""${str.replace("\"", "\\\"").replace("\n", raw"\n")}""""
       case _ => underlying.toString
     }
 
