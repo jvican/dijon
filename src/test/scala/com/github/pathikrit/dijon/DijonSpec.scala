@@ -347,6 +347,7 @@ class DijonSpec extends Specification {
       obj.greet = "hi\""
       parse(obj.toString) mustEqual obj
       json""" { "greet": "hi\\"" } """ mustEqual obj
+      //json""" { "greet": "hi\\\"" } """ mustNotEqual obj
 
       obj.nested = `{}`
       obj.nested.inner = "ho\""
