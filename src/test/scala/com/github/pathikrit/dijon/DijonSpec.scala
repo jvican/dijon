@@ -337,9 +337,9 @@ class DijonSpec extends Specification {
     "handle multiline strings correct" in {
       val obj = `{}`
       obj.str = """my
-                 |multiline
-                 |string""".stripMargin
-      obj.str.toString mustEqual raw""""my\nmultiline\nstring""""
+                  |multiline
+                  |string""".stripMargin
+      obj.str.toString mustEqual raw""""my\nmultiline\nstring"""" //"
     }
 
     "handle quotes in string keys" in {
@@ -347,7 +347,12 @@ class DijonSpec extends Specification {
       obj.greet = "hi\""
       parse(obj.toString) mustEqual obj
       json""" { "greet": "hi\\"" } """ mustEqual obj
-      //json""" { "greet": "hi\\\"" } """ mustNotEqual obj
+
+      obj.nested = `{}`
+      obj.nested.inner = "ho\""
+      parse(obj.toString) mustEqual obj
+      json""" { "greet": "hi\\"",
+                "nested": { "inner": "ho\\"" } } """ mustEqual obj
     }
   }
 }
