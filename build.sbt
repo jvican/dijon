@@ -1,14 +1,16 @@
 import SonatypeKeys._
 
-sonatypeSettings
-
 name := "dijon"
 
 version := "0.2.3"
 
-organization := "com.github.pathikrit"
-
 description := "Boiler-free JSON wrangling using Scala dynamic types"
+
+homepage := Some(url("http://github.com/pathikrit/dijon"))
+
+licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
+
+organization := "com.github.pathikrit"
 
 scalaVersion := "2.10.3"
 
@@ -17,15 +19,24 @@ scalacOptions ++= Seq(
   "-language:postfixOps,implicitConversions,experimental.macros,dynamics,existentials,higherKinds"
 )
 
+resolvers ++= Seq(
+  Resolver.sonatypeRepo("snapshots")
+)
+
+libraryDependencies ++= Seq(
+  "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+  "org.specs2" %% "specs2" % "2.3.11" % "test"
+)
+
+sonatypeSettings
+
 ScoverageSbtPlugin.instrumentSettings
 
 CoverallsPlugin.coverallsSettings
 
 CoverallsPlugin.CoverallsKeys.coverallsToken := Some("m1ICpWHwSZMMvgqeKbUaRE6RFre1p3zws")
 
-libraryDependencies ++= Seq("org.specs2" %% "specs2" % "2.3.10" % "test")
-
-libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-reflect" % _)
+autoCompilerPlugins := true
 
 pomExtra := {
   <url>http://github.com/pathikrit/dijon</url>
