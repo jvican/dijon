@@ -12,15 +12,11 @@ licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 
 organization := "com.github.pathikrit"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.10.4"
 
 scalacOptions ++= Seq(
   "-unchecked", "-deprecation", "-feature",
   "-language:postfixOps,implicitConversions,experimental.macros,dynamics,existentials,higherKinds"
-)
-
-resolvers ++= Seq(
-  Resolver.sonatypeRepo("snapshots")
 )
 
 libraryDependencies ++= Seq(
