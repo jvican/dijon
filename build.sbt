@@ -2,7 +2,7 @@ import SonatypeKeys._
 
 name := "dijon"
 
-version := "0.2.3"
+version := "0.2.4"
 
 description := "Boiler-free JSON wrangling using Scala dynamic types"
 
