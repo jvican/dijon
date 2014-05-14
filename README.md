@@ -2,7 +2,7 @@
 
 dijon - Dynamic Json in Scala
 =====
-* Boiler-free json wrangling using Scala [Dynamic Types](http://www.scala-lang.org/api/2.10.3/index.html#scala.Dynamic)
+* Boiler-free json wrangling using Scala [Dynamic Types](http://www.scala-lang.org/api/2.11.0/index.html#scala.Dynamic)
 * No external [dependencies](build.sbt)
 * Less than [100 lines](src/main/scala/com/github/pathikrit/dijon/package.scala) of code
 * Well [tested][1]
@@ -116,6 +116,7 @@ TODO
 * YAML interpolator
 * Macro for type inference to induce compile-time errors where possible
 * JSON string interpolator fills in braces, quotes and commas etc
-* Scala 2.11 compatibility without warnings
+* Remove warnings
+* Use [Scala pickling](https://github.com/pathikrit/dijon/commit/12a649631af6099dd440809583da10aed0f90f9a)
 
 [1]: src/test/scala/com/github/pathikrit/dijon/DijonSpec.scala
