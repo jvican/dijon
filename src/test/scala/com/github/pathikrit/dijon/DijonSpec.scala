@@ -225,15 +225,19 @@ class DijonSpec extends Specification {
     }
 
     "be type-safeish" in {
-      val json = `{}`
-      json.aString = "hi"                        // compiles
-      json.aBoolean = true                       // compiles
-      json.anInt = 23                            // compiles
+      var j = json"""{"name" : "chen"}"""
+      j.name mustEqual "chen"
+      j.name.as[String] must beSome("chen")
+      //j.name.as[Int] must beNone
+
+      j = `{}`
+      j.aString = "hi"                        // compiles
+      j.aBoolean = true                       // compiles
+      j.anInt = 23                            // compiles
       // test.somethingElse = Option("hi")       // does not compile
-      val Some(i: Int) = json.anInt.as[Int]
-      assert(i == 23)
+      val Some(i: Int) = j.anInt.as[Int]
+      i mustEqual 23
       //val j: Int = json.aBoolean.as[Int]    // run-time exception
-      ok
     }
 
     "grow arrays" in {
