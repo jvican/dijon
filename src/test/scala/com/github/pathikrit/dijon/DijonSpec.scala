@@ -181,6 +181,19 @@ class DijonSpec extends Specification {
       (cat.vet.address -- "city") mustEqual json"""{ "name" : "Animal Hospital", "zip": 94306}"""
     }
 
+    "handle nulls" in {
+      val t = json"""{"a": null, "b": {"c": null}}"""
+      t.a must beNull
+      t.b.c must beNull
+
+      val v = parse("""{"a": null}""")
+      v.a must beNull
+
+      t.b.c.a must throwA[NullPointerException]
+      t.b.c = v
+      t.b.c.a must beNull
+    }
+
     "handle merges" in {
       val scala = json"""
         {

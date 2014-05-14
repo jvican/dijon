@@ -83,7 +83,7 @@ package object dijon {
     override def hashCode = underlying.hashCode
   }
 
-  def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble) getOrElse (throw new IllegalArgumentException("Could not convert to JSON"))
+  def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble) getOrElse (throw new IllegalArgumentException("Invalid JSON"))
 
   def assemble(s: Any): SomeJson = s match {
     case null => null
