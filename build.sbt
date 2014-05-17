@@ -14,6 +14,8 @@ organization := "com.github.pathikrit"
 
 scalaVersion := "2.11.0"
 
+crossScalaVersions := Seq("2.10.4", "2.11.0")
+
 scalacOptions ++= Seq(
   "-unchecked", "-deprecation", "-feature",
   "-language:postfixOps,implicitConversions,experimental.macros,dynamics,existentials,higherKinds"
@@ -36,11 +38,9 @@ libraryDependencies := {
   }
 }
 
-crossScalaVersions := Seq("2.10.4", "2.11.0")
-
 sonatypeSettings
 
-ScoverageSbtPlugin.instrumentSettings
+instrumentSettings
 
 CoverallsPlugin.coverallsSettings
 
