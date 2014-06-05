@@ -3,8 +3,8 @@
 dijon - Dynamic Json in Scala
 =====
 * Boiler-free json wrangling using Scala [Dynamic Types](http://www.scala-lang.org/api/2.11.0/index.html#scala.Dynamic)
-* No external [dependencies](build.sbt)
-* Less than [100 lines](src/main/scala/com/github/pathikrit/dijon/package.scala) of code
+* Simple wrapper around [json4s](http://json4s.org/). No other [dependencies](build.sbt)
+* Less than [80 lines](src/main/scala/com/github/pathikrit/dijon/package.scala) of code
 * Well [tested][1]
 * Why yet another Scala json library? Well, code speaks more than thousand words:
 
@@ -105,7 +105,7 @@ Add the following to your `build.sbt` to use `dijon`:
 ```scala
 resolvers += "Sonatype releases" at "http://oss.sonatype.org/content/repositories/releases/"
 
-libraryDependency += "com.github.pathikrit" %% "dijon" % "0.2.4"
+libraryDependency += "com.github.pathikrit" %% "dijon" % "0.3.0"
 ```
 
 TODO
@@ -113,10 +113,10 @@ TODO
 * BigInt support
 * Pretty printer
 * Circular references checker
-* YAML interpolator
+* YAML, XML support
 * Macro for type inference to induce compile-time errors where possible
 * JSON string interpolator fills in braces, quotes and commas etc
 * Remove warnings
-* Use [Scala pickling](https://github.com/pathikrit/dijon/commit/12a649631af6099dd440809583da10aed0f90f9a)
+* Case class extraction/serialization
 
 [1]: src/test/scala/com/github/pathikrit/dijon/DijonSpec.scala

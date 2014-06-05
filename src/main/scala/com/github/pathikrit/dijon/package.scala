@@ -1,100 +1,77 @@
 package com.github.pathikrit
 
-import scala.collection.mutable
-import scala.reflect.runtime.universe._
-import scala.util.parsing.json.{JSON, JSONObject}
-
-import com.github.pathikrit.dijon.UnionType.{∨, ∅}
+import org.json4s.native.JsonMethods
+import JsonMethods._
+import org.json4s._
 
 package object dijon {
 
-  type JsonTypes = ∅ ∨ String ∨ Int ∨ Double ∨ Boolean ∨ JsonArray ∨ JsonObject ∨ None.type
-  type JsonType[A] = JsonTypes#Member[A]
-  type SomeJson = Json[A] forSome {type A}
+  case class Json(var underlying: JValue) extends Dynamic {
 
-  type JsonObject = mutable.Map[String, SomeJson]
-  def `{}`: SomeJson = mutable.Map.empty[String, SomeJson]
-
-  type JsonArray = mutable.Buffer[SomeJson]
-  def `[]`: SomeJson = mutable.Buffer.empty[SomeJson]
-
-  implicit class Json[A : JsonType](val underlying: A) extends Dynamic {
-
-    def selectDynamic(key: String): SomeJson = underlying match {
-      case obj: JsonObject if obj contains key => obj(key)
-      case _ => None
+    def selectDynamic(key: String): Json = underlying match {
+      case JObject(obj) => obj apply key
+      case _ => JNothing
     }
 
-    def updateDynamic(key: String)(value: SomeJson): Unit = underlying match {
-      case obj: JsonObject => obj(key) = value
+    def updateDynamic(key: String)(value: JValue): Unit = underlying match {
+      case JObject(obj) => underlying = JObject(obj + (key -> value))
       case _ =>
     }
 
-    def applyDynamic(key: String)(index: Int): SomeJson = underlying match {
-      case obj: JsonObject if obj contains key => obj(key)(index)
-      case arr: JsonArray if key == "apply" && (arr isDefinedAt index) => arr(index)
-      case _ => None
+    def applyDynamic(key: String)(index: Int): Json = underlying match {
+      case JObject(obj) if obj contains key => obj.apply(key)(index)
+      case JArray(arr) if key == "apply" && (arr isDefinedAt index) => arr(index)
+      case _ => JNothing
     }
 
-    def update(index: Int, value: SomeJson): Unit = underlying match {
-      case arr: JsonArray if index >= 0 =>
-        while(arr.size <= index) { arr += null }
-        arr(index) = value
+    def update(index: Int, value: JValue): Unit = underlying match {
+      case JArray(arr) if index >= 0 => underlying = JArray(List.tabulate((index+1) max arr.length) {i =>
+        if (i >= arr.length) JNull
+        else if (i == index) value
+        else arr(i)
+      })
       case _ =>
     }
 
-    def ++(that: SomeJson): SomeJson = (this.underlying, that.underlying) match {
-      case (a: JsonObject, b: JsonObject) =>
-        val res = a.clone()
-        b.keys foreach {
-          case key if res contains key => res(key) = res(key) ++ b(key)
-          case key => res(key) = b(key)
-        }
-        res
-      case _ => that
-    }
+    def ++(that: Json): Json = Json(this.underlying merge that.underlying)
 
-    def --(keys: String*): SomeJson = underlying match {
-      case obj: JsonObject => obj -- keys
+    def --(keys: String*): Json = underlying match {
+      case JObject(obj) => JObject(obj -- keys)
       case _ => this
     }
 
-    def as[T : JsonType : TypeTag]: Option[T] = underlying match {
-      case x: T => Some(x)
-      case _ => None
+    def toMap = underlying match {
+      case obj: JObject => obj.values
+      case _ => Map.empty[String, Any]
     }
 
-    def toMap: Map[String, SomeJson] = safeHack(as[JsonObject].get.toMap, Map.empty[String, SomeJson])
-    def toSeq: Seq[SomeJson] = safeHack(as[JsonArray].get.toSeq, Seq.empty[SomeJson])
-    private def safeHack[T](f: => T, default: T): T = scala.util.Try(f) getOrElse default
-
-    override def toString = underlying match {
-      case obj: JsonObject => new JSONObject(obj.toMap).toString
-      case arr: JsonArray => arr mkString ("[", ", ", "]")
-      case str: String => s""""${str.replace("\"", "\\\"").replace("\n", raw"\n")}""""
-      case _ => underlying.toString
+    def toSeq = underlying match {
+      case arr: JArray => arr.values
+      case _ => List.empty[Any]
     }
 
-    override def equals(obj: Any) = underlying == (obj match {
-      case that: SomeJson => that.underlying
-      case _ => obj
-    })
+    def as[A: Manifest] = underlying.extract[A]
+    def asOpt[A: Manifest] = underlying.extractOpt[A]
 
-    override def hashCode = underlying.hashCode
+    def toJsonString = compact(render(underlying))
+    override def toString = pretty(render(underlying))
   }
 
-  def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble) getOrElse (throw new IllegalArgumentException("Invalid JSON"))
+  def `{}`: Json = JObject()
+  def `[]`: Json = JArray(List.empty)
 
-  def assemble(s: Any): SomeJson = s match {
-    case null => null
-    case x: Map[String, Any] => mutable.Map((x mapValues assemble).toSeq : _*)
-    case x: Seq[Any] => mutable.Buffer[SomeJson](x map assemble : _*)
-    case x: String => x
-    case x: Double => x
-    case x: Boolean => x
-  }
+  val Implicits = BigDecimalMode
+  implicit val formats = DefaultFormats
+
+  implicit def jsonToJValue(json: Json): JValue = json.underlying
+  implicit def jValueToJson(v: JValue): Json = Json(v)
+
+  implicit def jFieldsToMap(l: List[JField]): Map[String, JValue] = l.toMap withDefaultValue JNothing
+  implicit def mapToJFields(m: Map[String, JValue]): List[JField] = m.toList
+
+  implicit def parse(s: String): Json = JsonMethods.parse(s)
 
   implicit class JsonStringContext(val sc: StringContext) extends AnyVal {
-    def json(args: Any*): SomeJson = parse(sc.s(args : _*))
+    def json(args: Any*): Json = parse(sc.s(args : _*))
   }
 }
