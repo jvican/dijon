@@ -1,6 +1,7 @@
 language: scala
 
-scala: 2.11.0
+scala: 2.11.1
 
 after_success:
+  - export COVERALLS_REPO_TOKEN=m1ICpWHwSZMMvgqeKbUaRE6RFre1p3zws
   - sbt coveralls
