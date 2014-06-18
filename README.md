@@ -4,7 +4,7 @@ dijon - Dynamic Json in Scala
 =====
 * Boiler-free json wrangling using Scala [Dynamic Types](http://www.scala-lang.org/api/2.11.0/index.html#scala.Dynamic)
 * Simple wrapper around [json4s](http://json4s.org/). No other [dependencies](build.sbt)
-* Less than [80 lines](src/main/scala/com/github/pathikrit/dijon/package.scala) of code
+* Less than [100 lines](src/main/scala/com/github/pathikrit/dijon/package.scala) of code
 * Well [tested][1]
 * Why yet another Scala json library? Well, code speaks more than thousand words:
 
