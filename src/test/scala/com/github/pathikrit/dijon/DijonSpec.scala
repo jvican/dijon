@@ -192,6 +192,8 @@ class DijonSpec extends Specification {
       t.b.c.a must throwA[NullPointerException]
       t.b.c = v
       t.b.c.a must beNull
+
+      t.toString must not beNull
     }
 
     "handle merges" in {
