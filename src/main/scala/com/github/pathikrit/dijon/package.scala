@@ -1,87 +1,81 @@
 package com.github.pathikrit
 
-import org.json4s.native.JsonMethods
-import JsonMethods._
+import org.json4s.native.JsonMethods._
 import org.json4s._
+import scala.collection.mutable
 
 package object dijon {
 
-  case class Json(var underlying: JValue) extends Dynamic {
-
-    def apply(index: Int): Json =  underlying match {
-      case JArray(arr) if arr isDefinedAt index => arr(index)
-      case _ => JNothing
-    }
-
-    def selectDynamic(key: String): Json = underlying match {
-      case JObject(obj) => obj apply key
-      case _ => JNothing
-    }
-
-    def updateDynamic(key: String)(value: JValue): Unit = underlying match {
-      case JObject(obj) => underlying = JObject(obj + (key -> value))
-      case _ =>
-    }
-
-    def applyDynamic(key: String)(index: Int): Json = underlying match {
-      case JObject(obj) if jFieldsToMap(obj) contains key => Json(obj.apply(key)).apply(index)
-      case JArray(arr) if key == "apply" && (arr isDefinedAt index) => throw new IllegalStateException("should not be called")
-      case _ => JNothing
-    }
-
-    def update(index: Int, value: JValue): Unit = underlying match {
-      case JArray(arr) if index >= 0 => underlying = JArray(List.tabulate((index+1) max arr.length) {i =>
-        if (i == index) value
-        else if (i >= arr.length) JNull
-        else arr(i)
-      })
-      case _ =>
-    }
-
-    def +++(that: Json) = Json(underlying merge that.underlying)
-
-    def --(keys: String*): Json = underlying match {
-      case JObject(obj) => JObject(obj -- keys)
-      case _ => this
-    }
-
-    def toMap = underlying match {
-      case obj: JObject => obj.values
-      case _ => Map.empty[String, Any]
-    }
-
-    def toSeq = underlying match {
-      case arr: JArray => arr.values
-      case _ => List.empty[Any]
-    }
-
-    def as[A: Manifest] = underlying.extract[A]
-    def asOpt[A: Manifest] = underlying.extractOpt[A]
-
-    def toJsonString = compact(render(underlying))
-    override def toString = underlying.toSome map render map pretty getOrElse "nothing"
-
-    override def equals(that: Any) = super.equals(that) || underlying == that || underlying.values == that || (that.isInstanceOf[Json] && underlying.values == that.asInstanceOf[Json].underlying.values)
+  abstract class DynamicJson(val j: JValue) extends Dynamic {
+    type U
+    val underlying: U
+    def apply(index: Int): DynamicJson = JNothing
+    def update(index: Int, value: JValue): Unit = {}
+    def selectDynamic(key: String): DynamicJson = JNothing
+    def updateDynamic(key: String)(value: JValue): Unit = {}
+    def applyDynamic(key: String)(index: Int): DynamicJson = JNothing
+    def as[A: Manifest]: A = j.extract[A]
+    def asOpt[A: Manifest]: Option[A] = j.extractOpt[A]
+    def +++(that: DynamicJson): DynamicJson = j merge that.j
+    def ---(keys: String*): DynamicJson = this
+    def toMap: Map[String, Any] = Map.empty[String, Any]
+    def toSeq: Seq[Any] = Seq.empty[Any]
+    override def toString: String = compact(render(j))
+    //override def equals(that: Any) = super.equals(that) || underlying == that || toJValue == that || (that.isInstanceOf[Json] && that.asInstanceOf[Json].underlying == underlying)
   }
 
-  def `{}`: Json = JObject()
-  def `[]`: Json = JArray(List.empty)
+  private[this] class DynamicJsonPrimitive(override val j: JValue) extends DynamicJson(j) {
+    override type U = j.Values
+    override val underlying = j.values
+  }
+
+  private[this] class DynamicJsonObject(override val j: JObject) extends DynamicJson(j) {
+    override type U = mutable.Map[String, DynamicJson]
+    override val underlying: U = mutable.Map(j.obj map { case (k, v) => k -> jValueToJson(v)}: _*)
+    override def selectDynamic(key: String) = {
+      println("obj.selectDynamic", key)
+      underlying(key)
+    }
+    override def updateDynamic(key: String)(value: JValue) = underlying(key) = value
+    override def applyDynamic(key: String)(index: Int) = underlying(key)(index)
+  }
+
+  private[this] class DynamicJsonArray(override val j: JArray) extends DynamicJson(j) {
+    override type U = mutable.Buffer[DynamicJson]
+    override val underlying: U = mutable.Buffer[DynamicJson](j.arr map jValueToJson: _*)
+    override def apply(index: Int) = {
+      println("arr.apply", index, underlying)
+      if (underlying isDefinedAt index) underlying(index) else super.apply(index)
+    }
+    override def update(index: Int, value: JValue): Unit = {
+      println("arr.updateDynamic", index, value, underlying)
+      if (index >= 0) {
+        while(underlying.size <= index) { underlying += JNothing }
+        underlying(index) = value
+      }
+    }
+    override def applyDynamic(key: String)(index: Int): DynamicJson = throw new UnsupportedOperationException(s"key: $key, index = $index")
+  }
+
+  def `{}`: DynamicJson = JObject()
+  def `[]`: DynamicJson = JArray(List.empty)
 
   val Implicits = BigDecimalMode
   import Implicits._
   implicit val formats = DefaultFormats
 
-  implicit def jValueToJson(v: JValue): Json = Json(v)
-  implicit def jsonToJValue(json: Json): JValue = json.underlying
-
-  implicit def jFieldsToMap(l: List[JField]): Map[String, JValue] = l.toMap withDefaultValue JNothing
-  implicit def mapToJFields(m: Map[String, JValue]): List[JField] = m.toList
+  implicit def jValueToJson(jValue: JValue): DynamicJson = jValue match {
+    case obj: JObject => new DynamicJsonObject(obj)
+    case arr: JArray => new DynamicJsonArray(arr)
+    case _ => new DynamicJsonPrimitive(jValue)
+  }
+  implicit def jsonToJValue(json: DynamicJson): JValue = json.j
 
   implicit class StringImplicits(s: String) {
-    def asJson: Json = parse(s)
+    def asJson: DynamicJson = parse(s)
   }
 
   implicit class JsonStringContext(val sc: StringContext) extends AnyVal {
-    def json(args: Any*): Json = sc.s(args: _*).asJson
+    def json(args: Any*): DynamicJson = sc.s(args: _*).asJson
   }
 }

@@ -77,8 +77,10 @@ class DijonSpec extends Specification {
       rick.hobbies(1).games.football mustNotEqual 0
 
       rick.hobbies(1).games.football.as[Boolean] must beFalse
-      //rick.hobbies(1).games.football.as[Int] must beNone
-      //rick.hobbies(1).games.foosball.as[Boolean] must beNone
+      rick.hobbies(1).games.football.as[Int] must throwAn[Exception]
+      rick.hobbies(1).games.football.asOpt[Int] must beNone
+      rick.hobbies(1).games.football.asOpt[Boolean] must beSome(false)
+      rick.hobbies(1).games.foosball.asOpt[Boolean] must beNone
 
       rick.hobbies(2)(0) mustEqual "coding"
       rick.hobbies(2)(0) mustNotEqual "cooking"
@@ -101,7 +103,7 @@ class DijonSpec extends Specification {
 
     "parse arrays" in {
       val empty = "[]".asJson
-      //empty(0) mustEqual None
+      empty(0) mustEqual None
       empty mustEqual `[]`
       empty mustEqual empty.toString.asJson
       empty.toSeq mustEqual Seq.empty
@@ -117,7 +119,7 @@ class DijonSpec extends Specification {
       b must beTrue
 
       val n = arr(2)
-      //assert(n == None)
+      //n must beNull
 
       val s: String = arr(3).as[String]
       s mustEqual "hi"
@@ -146,7 +148,7 @@ class DijonSpec extends Specification {
       assert(cat.age == age)
       val catAge: Double = cat.age.as[Double]    // type inference
       assert(catAge == age)
-      //assert(cat.age.as[Boolean] == None)
+      assert(cat.age.asOpt[Boolean] == None)
 
       val catMap = cat.toMap                           // view as a hashmap
       assert(catMap.keySet == Set("name", "age", "hobbies", "is cat"))
@@ -250,7 +252,7 @@ class DijonSpec extends Specification {
       langs(3) mustEqual null
       langs(5) mustEqual "F#"
       langs(1)(3) = "python4"
-      //langs(1)(3) mustEqual "python4"
+      langs(1)(3) mustEqual "python4"
       (langs(1)(100) -- "foo") mustEqual None
       (langs(1)(-1)(-20)(-39) -- "foo") mustEqual None
       //langs(3) = `{}`
@@ -339,7 +341,7 @@ class DijonSpec extends Specification {
     }
 
     "hashcode works correctly" in {
-      val map = mutable.Map.empty[Json, Int]
+      val map = mutable.Map.empty[DynamicJson, Int]
       val j1 = json"""{ "key" : 0 }"""
       val j2 = json"""{ "key" : "0" }"""
 
