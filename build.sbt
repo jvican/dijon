@@ -2,7 +2,7 @@ import SonatypeKeys._
 
 name := "dijon"
 
-version := "0.2.4"
+version := "0.3.0"
 
 description := "Boiler-free JSON wrangling using Scala dynamic types"
 
@@ -14,27 +14,13 @@ scalaVersion := "2.11.1"
 
 crossScalaVersions := Seq("2.10.4", "2.11.1")
 
-scalacOptions ++= Seq(
-  "-unchecked", "-deprecation", "-feature",
-  "-language:postfixOps,implicitConversions,experimental.macros,dynamics,existentials,higherKinds"
-)
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:implicitConversions,dynamics")
 
 libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+  "org.json4s" %% "json4s-native" % "3.2.9",
   "org.specs2" %% "specs2" % "2.3.12" % "test"
 )
-
-// Temporary hack to include scala-parser-combinators in 2.11
-
-libraryDependencies := {
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, scalaMajor)) if scalaMajor >= 11 =>
-      libraryDependencies.value ++ Seq(
-        "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1"
-      )
-    case _ => libraryDependencies.value
-  }
-}
 
 sonatypeSettings
 
