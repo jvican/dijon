@@ -1,7 +1,7 @@
 language: scala
 
 before_install:
-  sudo pip install codecov
+  sudo pip install git+git://github.com/codecov/codecov-python.git@master#egg=codecov
 
 scala: 2.11.1
 
