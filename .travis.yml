@@ -9,4 +9,3 @@ after_success:
   - export COVERALLS_REPO_TOKEN=m1ICpWHwSZMMvgqeKbUaRE6RFre1p3zws
   - sbt coveralls
   - codecov
-
