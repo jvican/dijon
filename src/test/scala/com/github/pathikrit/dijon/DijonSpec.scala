@@ -2,6 +2,7 @@ package com.github.pathikrit.dijon
 
 import org.specs2.mutable.Specification
 import scala.collection.mutable
+import scala.util.parsing.json.JSON
 
 class DijonSpec extends Specification {
 
@@ -372,6 +373,18 @@ class DijonSpec extends Specification {
       parse(obj.toString) mustEqual obj
       json""" { "greet": "hi\\"",
                 "nested": { "inner": "ho\\"" } } """ mustEqual obj
+    }
+
+    "handle numbers represented as integers" in {
+      val defaultNumberParser = JSON.perThreadNumberParser
+      JSON.perThreadNumberParser = _.toInt //change underlying JSON parser to create Ints instead of Doubles
+
+      val jsonStr = """{"anInt" : 1}"""
+      val obj = parse(jsonStr)
+
+      JSON.perThreadNumberParser = defaultNumberParser //reset number parser to original
+
+      obj.anInt mustEqual 1
     }
   }
 }
