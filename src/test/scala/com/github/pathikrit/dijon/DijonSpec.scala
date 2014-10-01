@@ -177,6 +177,8 @@ class DijonSpec extends Specification {
       var basicCat = cat -- "vet"                                  // remove 1 key
       basicCat = basicCat -- ("hobbies", "is cat", "paws")         // remove multiple keys ("paws" is not in cat)
       assert(basicCat == json"""{ "name": "Tigri", "age": 7}""")   // after dropping some keys above
+      basicCat.remove("age")                                       // remove 1 key by mutating object
+      assert(basicCat == json"""{ "name": "Tigri" }""")
 
       (cat.vet.address -- "city") mustEqual json"""{ "name" : "Animal Hospital", "zip": 94306}"""
     }
