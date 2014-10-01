@@ -59,6 +59,11 @@ package object dijon {
       case _ => this
     }
 
+    def remove(keys: String*): Unit = underlying match {
+      case obj: JsonObject => obj --= keys
+      case _ => this
+    }
+
     def as[T : JsonType : TypeTag]: Option[T] = underlying match {
       case x: T => Some(x)
       case _ => None
