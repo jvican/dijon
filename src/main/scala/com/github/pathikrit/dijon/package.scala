@@ -38,7 +38,7 @@ package object dijon {
 
     def update(index: Int, value: SomeJson): Unit = underlying match {
       case arr: JsonArray if index >= 0 =>
-        while(arr.size <= index) { arr += null }
+        while(arr.size <= index) { arr += None }
         arr(index) = value
       case _ =>
     }
@@ -59,6 +59,11 @@ package object dijon {
       case _ => this
     }
 
+    def remove(keys: String*): Unit = underlying match {
+      case obj: JsonObject => obj --= keys
+      case _ => this
+    }
+
     def as[T : JsonType : TypeTag]: Option[T] = underlying match {
       case x: T => Some(x)
       case _ => None
@@ -72,6 +77,7 @@ package object dijon {
       case obj: JsonObject => new JSONObject(obj.toMap).toString
       case arr: JsonArray => arr mkString ("[", ", ", "]")
       case str: String => s""""${str.replace("\"", "\\\"").replace("\n", raw"\n")}""""
+      case _: None.type => "null"
       case _ => underlying.toString
     }
 
@@ -86,11 +92,12 @@ package object dijon {
   def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble) getOrElse (throw new IllegalArgumentException("Invalid JSON"))
 
   def assemble(s: Any): SomeJson = s match {
-    case null => null
+    case null => None
     case x: Map[String, Any] => mutable.Map((x mapValues assemble).toSeq : _*)
     case x: Seq[Any] => mutable.Buffer[SomeJson](x map assemble : _*)
     case x: String => x
     case x: Double => x
+    case x: Int => x
     case x: Boolean => x
   }
 

@@ -2,6 +2,7 @@ package com.github.pathikrit.dijon
 
 import org.specs2.mutable.Specification
 import scala.collection.mutable
+import scala.util.parsing.json.JSON
 
 class DijonSpec extends Specification {
 
@@ -86,8 +87,8 @@ class DijonSpec extends Specification {
       rick.hobbies(2)(100) mustEqual None
       rick.hobbies(2)(100) mustNotEqual null
 
-      rick.hobbies(3) mustEqual null
-      rick.hobbies(3) mustNotEqual None
+      rick.hobbies(3) mustEqual None
+      rick.hobbies(3) mustNotEqual null
       rick.hobbies(4) mustNotEqual null
       rick.hobbies(4) mustEqual None
 
@@ -115,7 +116,7 @@ class DijonSpec extends Specification {
       b must beTrue
 
       val n = arr(2)
-      assert(n == null)
+      assert(n == None)
 
       val Some(s: String) = arr(3).as[String]
       s mustEqual "hi"
@@ -159,7 +160,7 @@ class DijonSpec extends Specification {
       vet.phones = `[]`                   // create empty json array
       val phone = "(650) 493-4233"
       vet.phones(2) = phone               // set the 3rd item in array to this phone
-      assert(vet.phones == mutable.Seq(null, null, phone))  // first 2 entries null
+      assert(vet.phones == mutable.Seq(None, None, phone))  // first 2 entries None
 
       vet.address = `{}`
       vet.address.name = "Animal Hospital"
@@ -177,21 +178,24 @@ class DijonSpec extends Specification {
       var basicCat = cat -- "vet"                                  // remove 1 key
       basicCat = basicCat -- ("hobbies", "is cat", "paws")         // remove multiple keys ("paws" is not in cat)
       assert(basicCat == json"""{ "name": "Tigri", "age": 7}""")   // after dropping some keys above
+      basicCat.remove("age")                                       // remove 1 key by mutating object
+      assert(basicCat == json"""{ "name": "Tigri" }""")
 
       (cat.vet.address -- "city") mustEqual json"""{ "name" : "Animal Hospital", "zip": 94306}"""
     }
 
     "handle nulls" in {
       val t = json"""{"a": null, "b": {"c": null}}"""
-      t.a must beNull
-      t.b.c must beNull
+      t.a mustEqual None
+      t.b.c mustEqual None
 
       val v = parse("""{"a": null}""")
-      v.a must beNull
+      v.a mustEqual None
 
-      t.b.c.a must throwA[NullPointerException]
+      assert(t == parse(t.toString)) //round-trip test
+
       t.b.c = v
-      t.b.c.a must beNull
+      t.b.c.a mustEqual None
     }
 
     "handle merges" in {
@@ -244,7 +248,7 @@ class DijonSpec extends Specification {
       val langs = json"""["scala", ["python2", "python3"]]"""
       langs(-2) = "java"
       langs(5) = "F#"
-      langs(3) mustEqual null
+      langs(3) mustEqual None
       langs(5) mustEqual "F#"
       langs(1)(3) = "python4"
       langs(1)(3) mustEqual "python4"
@@ -371,6 +375,18 @@ class DijonSpec extends Specification {
       parse(obj.toString) mustEqual obj
       json""" { "greet": "hi\\"",
                 "nested": { "inner": "ho\\"" } } """ mustEqual obj
+    }
+
+    "handle numbers represented as integers" in {
+      val defaultNumberParser = JSON.perThreadNumberParser
+      JSON.perThreadNumberParser = _.toInt //change underlying JSON parser to create Ints instead of Doubles
+
+      val jsonStr = """{"anInt" : 1}"""
+      val obj = parse(jsonStr)
+
+      JSON.perThreadNumberParser = defaultNumberParser //reset number parser to original
+
+      obj.anInt mustEqual 1
     }
   }
 }
