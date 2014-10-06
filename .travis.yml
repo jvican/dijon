@@ -1,7 +1,11 @@
 language: scala
 
+before_install:
+  sudo pip install codecov
+
 scala: 2.11.1
 
 after_success:
   - export COVERALLS_REPO_TOKEN=m1ICpWHwSZMMvgqeKbUaRE6RFre1p3zws
   - sbt coveralls
+  - codecov
