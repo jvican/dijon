@@ -1,3 +1,7 @@
+UPDATE: This repository is no longer being maintained. Please use [rapture.io](rapture.io) which has [similar JSON parsing](http://rapture.io/mod/json/) (amongst many other utils) as this library
+===
+
+
 [![Build Status](https://travis-ci.org/pathikrit/dijon.png?branch=master)](http://travis-ci.org/pathikrit/dijon) [![Coverage Status](https://coveralls.io/repos/pathikrit/dijon/badge.png)](https://coveralls.io/r/pathikrit/dijon)
 
 dijon - Dynamic Json in Scala
