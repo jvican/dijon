@@ -1,4 +1,4 @@
-UPDATE: This repository is no longer being maintained. Please use [rapture.io](rapture.io) which has [similar JSON parsing](http://rapture.io/mod/json/) (amongst many other utils) as this library
+UPDATE: This repository is no longer being maintained. Please use [rapture.io](http://rapture.io) which has [similar JSON parsing](http://rapture.io/mod/json/) (amongst many other utils) as this library
 ===
 
 
