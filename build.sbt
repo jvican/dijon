@@ -6,9 +6,9 @@ licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 
 organization := "com.github.pathikrit"
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.13.0"
 
-crossScalaVersions := Seq("2.10.4", "2.11.1")
+crossScalaVersions := Seq("2.11.12", "2.12.8", "2.13.0")
 
 scalacOptions ++= Seq(
   "-unchecked", "-deprecation", "-feature",
@@ -17,7 +17,7 @@ scalacOptions ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-  "org.specs2" %% "specs2" % "2.3.12" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.8" % Test
 )
 
 // Temporary hack to include scala-parser-combinators in 2.11
@@ -26,7 +26,7 @@ libraryDependencies := {
   CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, scalaMajor)) if scalaMajor >= 11 =>
       libraryDependencies.value ++ Seq(
-        "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1"
+        "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
       )
     case _ => libraryDependencies.value
   }
