@@ -1,8 +1,4 @@
-import SonatypeKeys._
-
 name := "dijon"
-
-version := "0.2.4"
 
 description := "Boiler-free JSON wrangling using Scala dynamic types"
 
@@ -35,14 +31,6 @@ libraryDependencies := {
     case _ => libraryDependencies.value
   }
 }
-
-sonatypeSettings
-
-instrumentSettings
-
-CoverallsPlugin.coverallsSettings
-
-autoCompilerPlugins := true
 
 pomExtra := {
   <url>http://github.com/pathikrit/dijon</url>
