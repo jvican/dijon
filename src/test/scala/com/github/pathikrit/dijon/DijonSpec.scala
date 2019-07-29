@@ -6,9 +6,7 @@ import scala.collection.mutable
 import scala.util.parsing.json.JSON
 
 class DijonSpec extends WordSpec with Matchers {
-
   "dijon" should {
-
     val (email1, email2) = ("pathikritbhowmick@msn.com", "pathikrit.bhowmick@gmail.com")
     val (name, age) = ("Rick", 27)
 

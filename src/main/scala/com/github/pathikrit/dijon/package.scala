@@ -7,19 +7,17 @@ import scala.util.parsing.json.{JSON, JSONObject}
 import com.github.pathikrit.dijon.UnionType.{∨, ∅}
 
 package object dijon {
-
   type JsonTypes = ∅ ∨ String ∨ Int ∨ Double ∨ Boolean ∨ JsonArray ∨ JsonObject ∨ None.type
   type JsonType[A] = JsonTypes#Member[A]
   type SomeJson = Json[A] forSome {type A}
-
   type JsonObject = mutable.Map[String, SomeJson]
+  type JsonArray = mutable.Buffer[SomeJson]
+
   def `{}`: SomeJson = mutable.Map.empty[String, SomeJson]
 
-  type JsonArray = mutable.Buffer[SomeJson]
   def `[]`: SomeJson = mutable.Buffer.empty[SomeJson]
 
   implicit class Json[A : JsonType: TypeTag](val underlying: A) extends Dynamic {
-
     def selectDynamic(key: String): SomeJson = underlying match {
       case obj: JsonObject if obj contains key => obj(key)
       case _ => None
@@ -70,10 +68,10 @@ package object dijon {
     }
 
     def toMap: Map[String, SomeJson] = safeHack(as[JsonObject].get.toMap, Map.empty[String, SomeJson])
-    def toSeq: Seq[SomeJson] = safeHack(as[JsonArray].get.toSeq, Seq.empty[SomeJson])
-    private def safeHack[T](f: => T, default: T): T = scala.util.Try(f) getOrElse default
 
-    override def toString = underlying match {
+    def toSeq: Seq[SomeJson] = safeHack(as[JsonArray].get.toSeq, Seq.empty[SomeJson])
+
+    override def toString: String = underlying match {
       case obj: JsonObject => new JSONObject(obj.toMap).toString
       case arr: JsonArray => arr mkString ("[", ", ", "]")
       case str: String => s""""${str.replace("\"", "\\\"").replace("\n", raw"\n")}""""
@@ -81,12 +79,14 @@ package object dijon {
       case _ => underlying.toString
     }
 
-    override def equals(obj: Any) = underlying == (obj match {
+    override def equals(obj: Any): Boolean = underlying == (obj match {
       case that: SomeJson => that.underlying
       case _ => obj
     })
 
-    override def hashCode = underlying.hashCode
+    override def hashCode: Int = underlying.hashCode
+
+    private[this] def safeHack[T](f: => T, default: T): T = scala.util.Try(f) getOrElse default
   }
 
   def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble) getOrElse (throw new IllegalArgumentException("Invalid JSON"))
