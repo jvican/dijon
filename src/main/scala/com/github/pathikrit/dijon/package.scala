@@ -18,7 +18,7 @@ package object dijon {
   type JsonArray = mutable.Buffer[SomeJson]
   def `[]`: SomeJson = mutable.Buffer.empty[SomeJson]
 
-  implicit class Json[A : JsonType](val underlying: A) extends Dynamic {
+  implicit class Json[A : JsonType: TypeTag](val underlying: A) extends Dynamic {
 
     def selectDynamic(key: String): SomeJson = underlying match {
       case obj: JsonObject if obj contains key => obj(key)
@@ -65,7 +65,7 @@ package object dijon {
     }
 
     def as[T : JsonType : TypeTag]: Option[T] = underlying match {
-      case x: T => Some(x)
+      case x: T if typeOf[A] <:< typeOf[T] => Some(x)
       case _ => None
     }
 

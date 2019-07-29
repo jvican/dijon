@@ -67,8 +67,8 @@ class DijonSpec extends WordSpec with Matchers {
       rick.hobbies(1).games.football shouldBe false
 
       rick.hobbies(1).games.football.as[Boolean] shouldBe Some(false)
-      //rick.hobbies(1).games.football.as[Int] shouldBe None
-      //rick.hobbies(1).games.foosball.as[Boolean] shouldBe None
+      rick.hobbies(1).games.football.as[Int] shouldBe None
+      rick.hobbies(1).games.foosball.as[Boolean] shouldBe None
 
       rick.hobbies(2)(0) shouldBe "coding"
 
@@ -81,7 +81,7 @@ class DijonSpec extends WordSpec with Matchers {
       rick.toMap.keySet shouldBe Set("name", "age", "class", "contact", "is online", "weight", "hobbies", "toMap")
       rick.selectDynamic("toMap")(1) shouldBe 345
       rick shouldBe parse(rick.toString) // round-trip test
-      //rick.toSeq shouldBe empty
+      rick.toSeq shouldBe empty
     }
 
     "parse arrays" in {
@@ -131,7 +131,7 @@ class DijonSpec extends WordSpec with Matchers {
       assert(cat.age == age)
       val Some(catAge: Double) = cat.age.as[Double]    // type inference
       assert(catAge == age)
-      //assert(cat.age.as[Boolean] == None)
+      assert(cat.age.as[Boolean].isEmpty)
 
       val catMap = cat.toMap                           // view as a hashmap
       assert(catMap.keySet == Set("name", "age", "hobbies", "is cat"))
@@ -158,7 +158,6 @@ class DijonSpec extends WordSpec with Matchers {
       assert(cat.vet.phones(2) == phone)
       assert(cat.vet.address.zip == 94306)     // json deep access
 
-      println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 7.0}
       assert(cat == parse(cat.toString))   // round-trip test
 
       var basicCat = cat -- "vet"                                  // remove 1 key
@@ -217,7 +216,7 @@ class DijonSpec extends WordSpec with Matchers {
       var j = json"""{"name" : "chen"}"""
       j.name shouldBe "chen"
       j.name.as[String] shouldBe Some("chen")
-      //j.name.as[Int] shouldBe None
+      j.name.as[Int] shouldBe None
 
       j = `{}`
       j.aString = "hi"                        // compiles
@@ -349,7 +348,6 @@ class DijonSpec extends WordSpec with Matchers {
       obj.greet = "hi\""
       parse(obj.toString) shouldBe obj
       json""" { "greet": "hi\\"" } """ shouldBe obj
-      //json""" { "greet": "hi\\\"" } """ shouldBe not obj
 
       obj.nested = `{}`
       obj.nested.inner = "ho\""
