@@ -17,20 +17,11 @@ scalacOptions ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+  "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.1",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"   % "0.52.2",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "0.52.2" % Provided, // required only in compile-time
   "org.scalatest" %% "scalatest" % "3.0.8" % Test
 )
-
-// Temporary hack to include scala-parser-combinators in 2.11
-
-libraryDependencies := {
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, scalaMajor)) if scalaMajor >= 11 =>
-      libraryDependencies.value ++ Seq(
-        "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
-      )
-    case _ => libraryDependencies.value
-  }
-}
 
 pomExtra := {
   <url>http://github.com/pathikrit/dijon</url>
