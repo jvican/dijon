@@ -260,10 +260,10 @@ class DijonSpec extends WordSpec with Matchers {
       j.aString = "hi"                        // compiles
       j.aBoolean = true                       // compiles
       j.anInt = 23                            // compiles
-      // test.somethingElse = Option("hi")       // does not compile
+      //j.somethingElse = Option("hi")        // does not compile
       val Some(i: Int) = j.anInt.as[Int]
       i shouldBe 23
-      //val j: Int = json.aBoolean.as[Int]    // run-time exception
+      j.aBoolean.as[Int] shouldBe None
     }
 
     "grow arrays" in {
