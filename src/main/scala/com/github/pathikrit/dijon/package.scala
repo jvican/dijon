@@ -4,6 +4,7 @@ import java.util
 
 import com.github.pathikrit.dijon.UnionType.{∅, ∨}
 import com.github.plokhotnyuk.jsoniter_scala.core._
+import scala.annotation.switch
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 import scala.reflect.runtime.universe._
@@ -15,7 +16,7 @@ package object dijon {
   type JsonObject = mutable.Map[String, SomeJson]
   type JsonArray = mutable.Buffer[SomeJson]
 
-  def `{}`: SomeJson = new util.LinkedHashMap[String, SomeJson](4).asScala
+  def `{}`: SomeJson = new util.LinkedHashMap[String, SomeJson].asScala
 
   def `[]`: SomeJson = mutable.Buffer.empty[SomeJson]
 
@@ -98,34 +99,32 @@ package object dijon {
   }
 
   implicit val codec: JsonValueCodec[SomeJson] = new JsonValueCodec[SomeJson] {
-    override def decodeValue(in: JsonReader, default: SomeJson): SomeJson = {
-      val b = in.nextToken()
-      if (b == 'n') in.readNullOrError(default, "expected `null` value")
-      else if (b == '"') {
+    override def decodeValue(in: JsonReader, default: SomeJson): SomeJson = (in.nextToken(): @switch) match {
+      case 'n' =>
+        in.readNullOrError(default, "expected `null` value")
+      case '"' =>
         in.rollbackToken()
         in.readString(null)
-      } else if (b == 'f' || b == 't') {
+      case 'f' | 't' =>
         in.rollbackToken()
-        if (in.readBoolean()) true
-        else false
-      } else if ((b >= '0' && b <= '9') || b == '-') {
+        in.readBoolean()
+      case '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '-' =>
         in.rollbackToken()
         val d = in.readDouble()
         val i = d.toInt
         if (i.toDouble == d) i
         else d
-      } else if (b == '[') {
-        val arr = new mutable.ArrayBuffer[SomeJson](4)
+      case '[' =>
+        val arr = new mutable.ArrayBuffer[SomeJson]
         if (!in.isNextToken(']')) {
           in.rollbackToken()
           do arr += decodeValue(in, default)
           while (in.isNextToken(','))
-          if (in.isCurrentToken(']')) arr
-          else in.arrayEndOrCommaError()
+          if (!in.isCurrentToken(']')) in.arrayEndOrCommaError()
         }
         arr
-      } else if (b == '{') {
-        val obj = new util.LinkedHashMap[String, SomeJson](4)
+      case '{' =>
+        val obj = new util.LinkedHashMap[String, SomeJson]
         if (!in.isNextToken('}')) {
           in.rollbackToken()
           do obj.put(in.readKeyAsString(), decodeValue(in, default))
@@ -133,11 +132,12 @@ package object dijon {
           if (!in.isCurrentToken('}')) in.objectEndOrCommaError()
         }
         obj.asScala
-      } else in.decodeError("expected JSON value")
+      case _ =>
+        in.decodeError("expected JSON value")
     }
 
     override def encodeValue(x: SomeJson, out: JsonWriter): Unit = x.underlying match {
-      case _: None.type => out.writeNull()
+      case None => out.writeNull()
       case str: String => out.writeVal(str)
       case b: Boolean => out.writeVal(b)
       case i: Int => out.writeVal(i)
