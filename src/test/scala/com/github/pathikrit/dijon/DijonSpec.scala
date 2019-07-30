@@ -355,5 +355,48 @@ class DijonSpec extends WordSpec with Matchers {
       val obj = parse(jsonStr)
       obj.anInt shouldBe 1
     }
+
+    "print pretty" in {
+      pretty(rick) shouldBe
+        """{
+          |  "name": "Rick",
+          |  "age": 27,
+          |  "class": "human",
+          |  "weight": 175.1,
+          |  "is online": true,
+          |  "contact": {
+          |    "emails": [
+          |      "pathikritbhowmick@msn.com",
+          |      "pathikrit.bhowmick@gmail.com"
+          |    ],
+          |    "phone": {
+          |      "home": "817-xxx-xxx",
+          |      "work": "650-xxx-xxx"
+          |    }
+          |  },
+          |  "hobbies": [
+          |    "eating",
+          |    {
+          |      "games": {
+          |        "chess": true,
+          |        "football": false
+          |      }
+          |    },
+          |    [
+          |      "coding",
+          |      [
+          |        "python",
+          |        "scala"
+          |      ]
+          |    ],
+          |    null
+          |  ],
+          |  "toMap": [
+          |    23,
+          |    345,
+          |    true
+          |  ]
+          |}""".stripMargin
+    }
   }
 }

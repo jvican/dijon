@@ -1,14 +1,9 @@
-UPDATE: This repository is no longer being maintained. Please use [rapture.io](http://rapture.io) which has [similar JSON parsing](http://rapture.io/mod/json/) (amongst many other utils) as this library
-===
-
-
 [![Build Status](https://travis-ci.org/pathikrit/dijon.png?branch=master)](http://travis-ci.org/pathikrit/dijon) [![Coverage Status](https://coveralls.io/repos/pathikrit/dijon/badge.png)](https://coveralls.io/r/pathikrit/dijon)
 
 dijon - Dynamic Json in Scala
 =====
-* Boiler-free json wrangling using Scala [Dynamic Types](http://www.scala-lang.org/api/2.11.0/index.html#scala.Dynamic)
-* No external [dependencies](build.sbt)
-* Less than [100 lines](src/main/scala/com/github/pathikrit/dijon/package.scala) of code
+* Boiler-free json wrangling using Scala [Dynamic Types](https://www.scala-lang.org/api/2.13.0/scala/Dynamic.html)
+* Less than 200 lines of code
 * Well [tested][1]
 * Why yet another Scala json library? Well, code speaks more than thousand words:
 
@@ -115,12 +110,10 @@ libraryDependency += "com.github.pathikrit" %% "dijon" % "0.2.4"
 TODO
 ====
 * BigInt support
-* Pretty printer
 * Circular references checker
 * YAML interpolator
 * Macro for type inference to induce compile-time errors where possible
 * JSON string interpolator fills in braces, quotes and commas etc
 * Remove warnings
-* Use [Scala pickling](https://github.com/pathikrit/dijon/commit/12a649631af6099dd440809583da10aed0f90f9a)
 
 [1]: src/test/scala/com/github/pathikrit/dijon/DijonSpec.scala

@@ -80,7 +80,7 @@ package object dijon {
       case None => Nil
     }
 
-    override def toString: String = serialize(this)
+    override def toString: String = compact(this)
 
     override def equals(obj: Any): Boolean = underlying == (obj match {
       case that: SomeJson => that.underlying
@@ -90,7 +90,9 @@ package object dijon {
     override def hashCode: Int = underlying.hashCode
   }
 
-  def serialize(json: SomeJson): String = writeToString[SomeJson](json)
+  def compact(json: SomeJson): String = writeToString[SomeJson](json)
+
+  def pretty(json: SomeJson): String = writeToString[SomeJson](json, WriterConfig(indentionStep = 2))
 
   def parse(s: String): SomeJson = readFromString[SomeJson](s)
 
