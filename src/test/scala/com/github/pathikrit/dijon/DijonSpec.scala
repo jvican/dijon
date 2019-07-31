@@ -296,6 +296,7 @@ class DijonSpec extends WordSpec with Matchers {
         "{key: 98}",
         "{'key': 98}",
         "{\"key\": 98\"}",
+        "{\"key\": [98, 0}",
         """ { "key": "hi""} """,           //http://stackoverflow.com/questions/15637429/
         "{\"foo\": 98 \"bar\": 0}"
       )
