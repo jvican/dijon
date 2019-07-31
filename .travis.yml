@@ -1,11 +1,26 @@
 language: scala
-
-before_install:
-  sudo pip install codecov
-
-scala: 2.11.1
-
+git:
+  depth: 100
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot
+    - $HOME/.coursier
+before_cache:
+  # Cleanup locks to avoid unnecessary cache updates
+  - find $HOME/.sbt -name "*.lock" | xargs rm
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode10.1 # macOS 10.13, JDK 11.0.1+13
+      scala: 2.13.0
+    - os: linux
+      jdk: openjdk8
+      scala: 2.12.8
+    - os: linux
+      jdk: openjdk8
+      scala: 2.11.12
+script:
+  - sbt -no-colors ++$TRAVIS_SCALA_VERSION -Dsbt.supershell=false clean coverage test coverageAggregate
 after_success:
-  - export COVERALLS_REPO_TOKEN=m1ICpWHwSZMMvgqeKbUaRE6RFre1p3zws
-  - sbt coveralls
-  - codecov
+  - bash <(curl -s https://codecov.io/bash)

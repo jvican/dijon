@@ -1,25 +1,26 @@
 package com.github.pathikrit
 
+import java.util
+
+import com.github.pathikrit.dijon.UnionType.{∅, ∨}
+import com.github.plokhotnyuk.jsoniter_scala.core._
+import scala.annotation.switch
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
 import scala.reflect.runtime.universe._
-import scala.util.parsing.json.{JSON, JSONObject}
-
-import com.github.pathikrit.dijon.UnionType.{∨, ∅}
 
 package object dijon {
-
   type JsonTypes = ∅ ∨ String ∨ Int ∨ Double ∨ Boolean ∨ JsonArray ∨ JsonObject ∨ None.type
   type JsonType[A] = JsonTypes#Member[A]
   type SomeJson = Json[A] forSome {type A}
-
   type JsonObject = mutable.Map[String, SomeJson]
-  def `{}`: SomeJson = mutable.Map.empty[String, SomeJson]
-
   type JsonArray = mutable.Buffer[SomeJson]
+
+  def `{}`: SomeJson = new util.LinkedHashMap[String, SomeJson].asScala
+
   def `[]`: SomeJson = mutable.Buffer.empty[SomeJson]
 
-  implicit class Json[A : JsonType](val underlying: A) extends Dynamic {
-
+  implicit class Json[A : JsonType: TypeTag](val underlying: A) extends Dynamic {
     def selectDynamic(key: String): SomeJson = underlying match {
       case obj: JsonObject if obj contains key => obj(key)
       case _ => None
@@ -65,43 +66,97 @@ package object dijon {
     }
 
     def as[T : JsonType : TypeTag]: Option[T] = underlying match {
-      case x: T => Some(x)
+      case x: T if typeOf[A] <:< typeOf[T] => Some(x)
       case _ => None
     }
 
-    def toMap: Map[String, SomeJson] = safeHack(as[JsonObject].get.toMap, Map.empty[String, SomeJson])
-    def toSeq: Seq[SomeJson] = safeHack(as[JsonArray].get.toSeq, Seq.empty[SomeJson])
-    private def safeHack[T](f: => T, default: T): T = scala.util.Try(f) getOrElse default
-
-    override def toString = underlying match {
-      case obj: JsonObject => new JSONObject(obj.toMap).toString
-      case arr: JsonArray => arr mkString ("[", ", ", "]")
-      case str: String => s""""${str.replace("\"", "\\\"").replace("\n", raw"\n")}""""
-      case _: None.type => "null"
-      case _ => underlying.toString
+    def toMap: Map[String, SomeJson] = as[JsonObject] match {
+      case Some(x) => x.toMap
+      case None => Map.empty[String, SomeJson]
     }
 
-    override def equals(obj: Any) = underlying == (obj match {
+    def toSeq: Seq[SomeJson] = as[JsonArray] match {
+      case Some(x) => x.toSeq
+      case None => Nil
+    }
+
+    override def toString: String = compact(this)
+
+    override def equals(obj: Any): Boolean = underlying == (obj match {
       case that: SomeJson => that.underlying
       case _ => obj
     })
 
-    override def hashCode = underlying.hashCode
+    override def hashCode: Int = underlying.hashCode
   }
 
-  def parse(s: String): SomeJson = (JSON.parseFull(s) map assemble) getOrElse (throw new IllegalArgumentException("Invalid JSON"))
+  def compact(json: SomeJson): String = writeToString[SomeJson](json)
 
-  def assemble(s: Any): SomeJson = s match {
-    case null => None
-    case x: Map[String, Any] => mutable.Map((x mapValues assemble).toSeq : _*)
-    case x: Seq[Any] => mutable.Buffer[SomeJson](x map assemble : _*)
-    case x: String => x
-    case x: Double => x
-    case x: Int => x
-    case x: Boolean => x
-  }
+  def pretty(json: SomeJson): String = writeToString[SomeJson](json, WriterConfig(indentionStep = 2))
+
+  def parse(s: String): SomeJson = readFromString[SomeJson](s)
 
   implicit class JsonStringContext(val sc: StringContext) extends AnyVal {
-    def json(args: Any*): SomeJson = parse(sc.s(args : _*))
+    def json(args: Any*): SomeJson = parse(sc.s(args: _*))
+  }
+
+  implicit val codec: JsonValueCodec[SomeJson] = new JsonValueCodec[SomeJson] {
+    override def decodeValue(in: JsonReader, default: SomeJson): SomeJson = (in.nextToken(): @switch) match {
+      case 'n' =>
+        in.readNullOrError(default, "expected `null` value")
+      case '"' =>
+        in.rollbackToken()
+        in.readString(null)
+      case 'f' | 't' =>
+        in.rollbackToken()
+        in.readBoolean()
+      case '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '-' =>
+        in.rollbackToken()
+        val d = in.readDouble()
+        val i = d.toInt
+        if (i.toDouble == d) i
+        else d
+      case '[' =>
+        val arr = new mutable.ArrayBuffer[SomeJson]
+        if (!in.isNextToken(']')) {
+          in.rollbackToken()
+          do arr += decodeValue(in, default)
+          while (in.isNextToken(','))
+          if (!in.isCurrentToken(']')) in.arrayEndOrCommaError()
+        }
+        arr
+      case '{' =>
+        val obj = new util.LinkedHashMap[String, SomeJson]
+        if (!in.isNextToken('}')) {
+          in.rollbackToken()
+          do obj.put(in.readKeyAsString(), decodeValue(in, default))
+          while (in.isNextToken(','))
+          if (!in.isCurrentToken('}')) in.objectEndOrCommaError()
+        }
+        obj.asScala
+      case _ =>
+        in.decodeError("expected JSON value")
+    }
+
+    override def encodeValue(x: SomeJson, out: JsonWriter): Unit = x.underlying match {
+      case None => out.writeNull()
+      case str: String => out.writeVal(str)
+      case b: Boolean => out.writeVal(b)
+      case i: Int => out.writeVal(i)
+      case d: Double => out.writeVal(d)
+      case arr: JsonArray =>
+        out.writeArrayStart()
+        arr.foreach(v => encodeValue(v, out))
+        out.writeArrayEnd()
+      case obj: JsonObject =>
+        out.writeObjectStart()
+        obj.foreach { case (k, v) =>
+          out.writeKey(k)
+          encodeValue(v, out)
+        }
+        out.writeObjectEnd()
+    }
+
+    override val nullValue: SomeJson = None
   }
 }
