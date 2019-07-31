@@ -42,7 +42,7 @@ vet.address = `{}`
 vet.address.name = "Animal Hospital"
 vet.address.city = "Palo Alto"
 vet.address.zip = 94306
-assert(vet.address == mutable.Map("name" -> "Animal Hospital", "city" -> "Palo Alto", "zip" -> 94306))
+assert(vet.address == mutable.Map[String, SomeJson]("name" -> "Animal Hospital", "city" -> "Palo Alto", "zip" -> 94306))
 
 cat.vet = vet                            // set the cat.vet to be the vet json object we created above
 assert(cat.vet.phones(2) == phone)

@@ -18,7 +18,7 @@ scalacOptions ++= Seq(
 libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-reflect" % scalaVersion.value,
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.1",
-  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"   % "0.52.2",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "0.54.0",
   "org.scalatest" %% "scalatest" % "3.0.8" % Test
 )
 
