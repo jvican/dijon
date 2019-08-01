@@ -7,7 +7,7 @@ import com.github.plokhotnyuk.jsoniter_scala.core._
 import scala.annotation.switch
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
-import scala.reflect.runtime.universe._
+import scala.reflect.runtime.universe.{TypeTag, typeOf}
 
 package object dijon {
   type JsonTypes = ∅ ∨ String ∨ Int ∨ Double ∨ Boolean ∨ JsonArray ∨ JsonObject ∨ None.type
@@ -18,7 +18,7 @@ package object dijon {
 
   def `{}`: SomeJson = new util.LinkedHashMap[String, SomeJson].asScala
 
-  def `[]`: SomeJson = mutable.Buffer.empty[SomeJson]
+  def `[]`: SomeJson = new mutable.ArrayBuffer[SomeJson]
 
   implicit class Json[A : JsonType: TypeTag](val underlying: A) extends Dynamic {
     def selectDynamic(key: String): SomeJson = underlying match {
@@ -28,7 +28,7 @@ package object dijon {
 
     def updateDynamic(key: String)(value: SomeJson): Unit = underlying match {
       case obj: JsonObject => obj(key) = value
-      case _ =>
+      case _ => ()
     }
 
     def applyDynamic(key: String)(index: Int): SomeJson = underlying match {
@@ -39,7 +39,9 @@ package object dijon {
 
     def update(index: Int, value: SomeJson): Unit = underlying match {
       case arr: JsonArray if index >= 0 =>
-        while(arr.size <= index) { arr += None }
+        while (arr.size <= index) {
+          arr += None
+        }
         arr(index) = value
       case _ =>
     }
@@ -62,7 +64,7 @@ package object dijon {
 
     def remove(keys: String*): Unit = underlying match {
       case obj: JsonObject => obj --= keys
-      case _ => this
+      case _ => ()
     }
 
     def as[T : JsonType : TypeTag]: Option[T] = underlying match {

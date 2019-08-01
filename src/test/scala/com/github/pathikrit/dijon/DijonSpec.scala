@@ -198,6 +198,11 @@ class DijonSpec extends WordSpec with Matchers {
 
       assert(cat == parse(cat.toString))   // round-trip test
 
+      cat.name.remove("something")         // do nothing
+      cat.age.remove("something")          // do nothing
+      cat.`is cat`.remove("something")     // do nothing
+      vet.phones.remove("something")       // do nothing
+
       var basicCat = cat -- "vet"                                  // remove 1 key
       basicCat = basicCat -- ("hobbies", "is cat", "paws")         // remove multiple keys ("paws" is not in cat)
       assert(basicCat == json"""{ "name": "Tigri", "age": 7}""")   // after dropping some keys above
