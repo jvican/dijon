@@ -72,13 +72,13 @@ package object dijon {
       case _ => None
     }
 
-    def toMap: Map[String, SomeJson] = as[JsonObject] match {
-      case Some(x) => x.toMap
-      case None => Map.empty[String, SomeJson]
+    def toMap: collection.Map[String, SomeJson] = as[JsonObject] match {
+      case Some(x) => x
+      case None => Map.empty
     }
 
-    def toSeq: Seq[SomeJson] = as[JsonArray] match {
-      case Some(x) => x.toSeq
+    def toSeq: collection.Seq[SomeJson] = as[JsonArray] match {
+      case Some(x) => x
       case None => Nil
     }
 
