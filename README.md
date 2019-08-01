@@ -3,6 +3,7 @@
 dijon - Dynamic Json in Scala
 =====
 * Boiler-free json wrangling using Scala [Dynamic Types](https://www.scala-lang.org/api/2.13.0/scala/Dynamic.html)
+* Support of [RFC8259](https://tools.ietf.org/html/rfc8259)
 * Less than 200 lines of code
 * Well [tested][1]
 * Why yet another Scala json library? Well, code speaks more than thousand words:
@@ -42,7 +43,7 @@ vet.address = `{}`
 vet.address.name = "Animal Hospital"
 vet.address.city = "Palo Alto"
 vet.address.zip = 94306
-assert(vet.address == mutable.Map("name" -> "Animal Hospital", "city" -> "Palo Alto", "zip" -> 94306))
+assert(vet.address == mutable.Map[String, SomeJson]("name" -> "Animal Hospital", "city" -> "Palo Alto", "zip" -> 94306))
 
 cat.vet = vet                            // set the cat.vet to be the vet json object we created above
 assert(cat.vet.phones(2) == phone)
@@ -90,10 +91,10 @@ val json = `{}`
 json.aString = "hi"                        // compiles
 json.aBoolean = true                       // compiles
 json.anInt = 23                            // compiles
-// test.somethingElse = Option("hi")       // does not compile
+//json.somethingElse = Option("hi")       // does not compile
 val Some(i: Int) = json.anInt.as[Int]
 assert(i == 23)
-val j: Int = json.aBoolean.as[Int]    // run-time exception
+assert(json.aBoolean.as[Int] == None)
 ```
 
 See the [spec][1] for more examples.
@@ -102,9 +103,11 @@ Usage
 ===
 Add the following to your `build.sbt` to use `dijon`:
 ```scala
-resolvers += "Sonatype releases" at "http://oss.sonatype.org/content/repositories/releases/"
-
 libraryDependency += "com.github.pathikrit" %% "dijon" % "0.2.4"
+```
+Add import of the package objects of dijon:
+```scala
+import com.github.pathikrit.dijon._
 ```
 
 TODO

@@ -1,3 +1,8 @@
+import scala.util._
+import scala.sys.process._
+
+lazy val oldVersion = Try("git describe --abbrev=0".!!.trim.replaceAll("^v", "")).getOrElse("0.2.4")
+
 name := "dijon"
 
 description := "Boiler-free JSON wrangling using Scala dynamic types"
@@ -18,9 +23,30 @@ scalacOptions ++= Seq(
 libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-reflect" % scalaVersion.value,
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.1",
-  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"   % "0.52.2",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "0.54.0",
   "org.scalatest" %% "scalatest" % "3.0.8" % Test
 )
+
+mimaCheckDirection := {
+  def isPatch: Boolean = {
+    val Array(newMajor, newMinor, _) = version.value.split('.')
+    val Array(oldMajor, oldMinor, _) = oldVersion.split('.')
+    newMajor == oldMajor && newMinor == oldMinor
+  }
+
+  if (isPatch) "both" else "backward"
+}
+
+mimaPreviousArtifacts := {
+  def isCheckingRequired: Boolean = {
+    val Array(newMajor, newMinor, _) = version.value.split('.')
+    val Array(oldMajor, oldMinor, _) = oldVersion.split('.')
+    newMajor == oldMajor && (newMajor != "0" || newMinor == oldMinor)
+  }
+
+  if (isCheckingRequired) Set(organization.value %% moduleName.value % oldVersion)
+  else Set()
+}
 
 pomExtra := {
   <url>http://github.com/pathikrit/dijon</url>

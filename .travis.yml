@@ -21,6 +21,6 @@ matrix:
       jdk: openjdk8
       scala: 2.11.12
 script:
-  - sbt -no-colors ++$TRAVIS_SCALA_VERSION -Dsbt.supershell=false clean coverage test coverageAggregate
+  - sbt -no-colors ++$TRAVIS_SCALA_VERSION -Dsbt.supershell=false clean coverage test coverageAggregate mimaReportBinaryIssues
 after_success:
   - bash <(curl -s https://codecov.io/bash)

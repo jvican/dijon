@@ -190,7 +190,7 @@ class DijonSpec extends WordSpec with Matchers {
       vet.address.name = "Animal Hospital"
       vet.address.city = "Palo Alto"
       vet.address.zip = 94306
-      //assert(vet.address == mutable.Map("zip" -> 94306, "name" -> "Animal Hospital", "city" -> "Palo Alto")) FIXME: fix assertion
+      assert(vet.address == mutable.Map[String, SomeJson]("name" -> "Animal Hospital", "city" -> "Palo Alto", "zip" -> 94306))
 
       cat.vet = vet                            // set the cat.vet to be the vet json object we created above
       assert(cat.vet.phones(2) == phone)
@@ -289,13 +289,16 @@ class DijonSpec extends WordSpec with Matchers {
         "hi",
         "-",
         "00",
+        "0-0",
         "",
-        //"{}}", FIXME: should be fixed in jsoniter-scala-core
+        "{}}",
         "[[]",
         "{key: 98}",
         "{'key': 98}",
         "{\"key\": 98\"}",
-        """ { "key": "hi""} """           //http://stackoverflow.com/questions/15637429/
+        "{\"key\": [98, 0}",
+        """ { "key": "hi""} """,           //http://stackoverflow.com/questions/15637429/
+        "{\"foo\": 98 \"bar\": 0}"
       )
 
       for (str <- tests) {
