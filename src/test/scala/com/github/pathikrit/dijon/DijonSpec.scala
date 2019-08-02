@@ -63,9 +63,9 @@ class DijonSpec extends WordSpec with Matchers {
       rick.hobbies(1).games.chess shouldBe true
       rick.hobbies(1).games.football shouldBe false
 
-      rick.hobbies(1).games.football.as[Boolean] shouldBe Some(false)
-      rick.hobbies(1).games.football.as[Int] shouldBe None
-      rick.hobbies(1).games.foosball.as[Boolean] shouldBe None
+      rick.hobbies(1).games.football.asBoolean shouldBe Some(false)
+      rick.hobbies(1).games.football.asInt shouldBe None
+      rick.hobbies(1).games.foosball.asBoolean shouldBe None
 
       rick.hobbies(2)(0) shouldBe "coding"
 
@@ -133,16 +133,16 @@ class DijonSpec extends WordSpec with Matchers {
       val arr = json"""[1, true, null, "hi", {"key": "value"}]"""
       arr shouldBe parse(arr.toString)
 
-      val Some(i: Int) = arr(0).as[Int]
+      val Some(i: Int) = arr(0).asInt
       i shouldBe 1
 
-      val Some(b: Boolean) = arr(1).as[Boolean]
+      val Some(b: Boolean) = arr(1).asBoolean
       b shouldBe true
 
       val n = arr(2)
       assert(n == None)
 
-      val Some(s: String) = arr(3).as[String]
+      val Some(s: String) = arr(3).asString
       s shouldBe "hi"
 
       val m = arr(4).toMap
@@ -156,23 +156,35 @@ class DijonSpec extends WordSpec with Matchers {
     }
 
     "handle json upates" in {
-      val (name, age) = ("Tigri", 7)
+      val (name, age, temperature) = ("Tigri", 7, 38.5)
       val cat = json"""
         {
           "name": "$name",
           "age": $age,
+          "temperature": $temperature,
           "hobbies": ["eating", "purring"],
           "is cat": true
         }
       """
       assert(cat.name == name)                         // dynamic type
+      val Some(catName: String) = cat.name.asString
+      assert(catName == name)
+      assert(cat.name.asBoolean.isEmpty)
+      assert(cat.name.asDouble.isEmpty)
+
       assert(cat.age == age)
-      val Some(catAge: Int) = cat.age.as[Int]    // type inference
+      val Some(catAge: Int) = cat.age.asInt
       assert(catAge == age)
-      assert(cat.age.as[Boolean].isEmpty)
+      assert(cat.age.asBoolean.isEmpty)
+      assert(cat.age.asString.isEmpty)
+
+      assert(cat.temperature == temperature)
+      val Some(catTemp: Double) = cat.temperature.asDouble
+      assert(catTemp == temperature)
+      assert(cat.age.asBoolean.isEmpty)
 
       val catMap = cat.toMap                           // view as a hashmap
-      assert(catMap.keySet == Set("name", "age", "hobbies", "is cat"))
+      assert(catMap.keySet == Set("name", "age", "temperature", "hobbies", "is cat"))
 
       assert(cat.hobbies(1) == "purring") // array access
       assert(cat.hobbies(100) == None)    // missing element
@@ -205,17 +217,20 @@ class DijonSpec extends WordSpec with Matchers {
 
       var basicCat = cat -- "vet"                                  // remove 1 key
       basicCat = basicCat -- ("hobbies", "is cat", "paws")         // remove multiple keys ("paws" is not in cat)
-      assert(basicCat == json"""{ "name": "Tigri", "age": 7}""")   // after dropping some keys above
+      assert(basicCat == json"""{"name":"Tigri","temperature":38.5,"age": 7}""")   // after dropping some keys above
       basicCat.remove("age")                                       // remove 1 key by mutating object
-      assert(basicCat == json"""{ "name": "Tigri" }""")
+      assert(basicCat == json"""{"name": "Tigri","temperature":38.5}""")
 
-      (cat.vet.address -- "city") shouldBe json"""{ "name" : "Animal Hospital", "zip": 94306}"""
+      (cat.vet.address -- "city") shouldBe json"""{"name":"Animal Hospital","zip": 94306}"""
     }
 
     "handle nulls" in {
-      val t = json"""{"a": null, "b": {"c": null}}"""
+      val t = json"""{"a":null,"b":{"c":null}}"""
       t.a shouldBe None
       t.b.c shouldBe None
+      val Some(a: None.type) = t.a.asNone
+      assert(a == None)
+      assert(t.b.asNone.isEmpty)
 
       val v = parse("""{"a": null}""")
       v.a shouldBe None
@@ -258,17 +273,17 @@ class DijonSpec extends WordSpec with Matchers {
     "be type-safeish" in {
       var j = json"""{"name" : "chen"}"""
       j.name shouldBe "chen"
-      j.name.as[String] shouldBe Some("chen")
-      j.name.as[Int] shouldBe None
+      j.name.asString shouldBe Some("chen")
+      j.name.asInt shouldBe None
 
       j = `{}`
       j.aString = "hi"                        // compiles
       j.aBoolean = true                       // compiles
       j.anInt = 23                            // compiles
       //j.somethingElse = Option("hi")        // does not compile
-      val Some(i: Int) = j.anInt.as[Int]
+      val Some(i: Int) = j.anInt.asInt
       i shouldBe 23
-      j.aBoolean.as[Int] shouldBe None
+      j.aBoolean.asInt shouldBe None
     }
 
     "grow arrays" in {

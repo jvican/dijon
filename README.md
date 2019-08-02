@@ -20,9 +20,9 @@ val cat = json"""
 """
 assert(cat.name == name)                         // dynamic type
 assert(cat.age == age)
-val Some(catAge: Double) = cat.age.as[Double]    // type inference
+val Some(catAge: Int) = cat.age.asInt
 assert(catAge == age)
-assert(cat.age.as[Boolean] == None)
+assert(cat.age.asBoolean == None)
 
 val catMap = cat.toMap                           // view as a hashmap
 assert(catMap.keySet == Set("name", "age", "hobbies", "is cat"))
@@ -92,9 +92,9 @@ json.aString = "hi"                        // compiles
 json.aBoolean = true                       // compiles
 json.anInt = 23                            // compiles
 //json.somethingElse = Option("hi")       // does not compile
-val Some(i: Int) = json.anInt.as[Int]
+val Some(i: Int) = json.anInt.asInt
 assert(i == 23)
-assert(json.aBoolean.as[Int] == None)
+assert(json.aBoolean.asInt == None)
 ```
 
 See the [spec][1] for more examples.
