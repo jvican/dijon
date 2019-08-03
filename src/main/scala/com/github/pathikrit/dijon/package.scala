@@ -4,10 +4,10 @@ import java.util
 
 import com.github.pathikrit.dijon.UnionType.{∅, ∨}
 import com.github.plokhotnyuk.jsoniter_scala.core._
+
 import scala.annotation.switch
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
-import scala.reflect.runtime.universe._
 
 package object dijon {
   type JsonTypes = ∅ ∨ String ∨ Int ∨ Double ∨ Boolean ∨ JsonArray ∨ JsonObject ∨ None.type
@@ -18,9 +18,9 @@ package object dijon {
 
   def `{}`: SomeJson = new util.LinkedHashMap[String, SomeJson].asScala
 
-  def `[]`: SomeJson = mutable.Buffer.empty[SomeJson]
+  def `[]`: SomeJson = new mutable.ArrayBuffer[SomeJson]
 
-  implicit class Json[A : JsonType: TypeTag](val underlying: A) extends Dynamic {
+  implicit class Json[A : JsonType](val underlying: A) extends Dynamic {
     def selectDynamic(key: String): SomeJson = underlying match {
       case obj: JsonObject if obj contains key => obj(key)
       case _ => None
@@ -28,7 +28,7 @@ package object dijon {
 
     def updateDynamic(key: String)(value: SomeJson): Unit = underlying match {
       case obj: JsonObject => obj(key) = value
-      case _ =>
+      case _ => ()
     }
 
     def applyDynamic(key: String)(index: Int): SomeJson = underlying match {
@@ -39,7 +39,9 @@ package object dijon {
 
     def update(index: Int, value: SomeJson): Unit = underlying match {
       case arr: JsonArray if index >= 0 =>
-        while(arr.size <= index) { arr += None }
+        while (arr.size <= index) {
+          arr += None
+        }
         arr(index) = value
       case _ =>
     }
@@ -62,22 +64,42 @@ package object dijon {
 
     def remove(keys: String*): Unit = underlying match {
       case obj: JsonObject => obj --= keys
-      case _ => this
+      case _ => ()
     }
 
-    def as[T : JsonType : TypeTag]: Option[T] = underlying match {
-      case x: T if typeOf[A] <:< typeOf[T] => Some(x)
+    def asString: Option[String] = underlying match {
+      case x: String => Some(x)
       case _ => None
     }
 
-    def toMap: Map[String, SomeJson] = as[JsonObject] match {
-      case Some(x) => x.toMap
-      case None => Map.empty[String, SomeJson]
+    def asDouble: Option[Double] = underlying match {
+      case x: Double => Some(x)
+      case _ => None
     }
 
-    def toSeq: Seq[SomeJson] = as[JsonArray] match {
-      case Some(x) => x.toSeq
-      case None => Nil
+    def asInt: Option[Int] = underlying match {
+      case x: Int => Some(x)
+      case _ => None
+    }
+
+    def asBoolean: Option[Boolean] = underlying match {
+      case x: Boolean => Some(x)
+      case _ => None
+    }
+
+    def toSeq: collection.Seq[SomeJson] = underlying match {
+      case arr: JsonArray => arr
+      case _ => Nil
+    }
+
+    def toMap: collection.Map[String, SomeJson] = underlying match {
+      case obj: JsonObject => obj
+      case _ => Map.empty
+    }
+
+    def asNone: Option[None.type] = underlying match {
+      case x: None.type => Some(x)
+      case _ => None
     }
 
     override def toString: String = compact(this)
