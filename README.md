@@ -3,7 +3,7 @@
 dijon - Dynamic Json in Scala
 =====
 * Boiler-free json wrangling using Scala [Dynamic Types](https://www.scala-lang.org/api/2.13.0/scala/Dynamic.html)
-* Support of [RFC8259](https://tools.ietf.org/html/rfc8259)
+* Support of [RFC8259](https://tools.ietf.org/html/rfc8259) using a codec based on [jsoniter-scala-core][2] 
 * Less than 200 lines of code
 * Well [tested][1]
 * Why yet another Scala json library? Well, code speaks more than thousand words:
@@ -62,7 +62,7 @@ assert(basicCat == json"""{ "name": "Tigri", "age": 7}""")   // after dropping s
 val scala = json"""
 {
   "name": "scala",
-  "version": "2.10.3",
+  "version": "2.13.0",
   "features": {
     "functional": true,
     "awesome": true
@@ -81,8 +81,8 @@ val java = json"""
 }
 """
 
-assert((scala ++ java) == json"""{"name": "java", "version": "2.10.3", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
-assert((java ++ scala) == json"""{"name": "scala", "version": "2.10.3", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
+assert((scala ++ java) == json"""{"name": "java", "version": "2.13.0", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
+assert((java ++ scala) == json"""{"name": "scala", "version": "2.13.0", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
 ```
 
 * [Union types](src/main/scala/com/github/pathikrit/dijon/UnionType.scala) for [type-safety](src/main/scala/com/github/pathikrit/dijon/package.scala#L11):
@@ -99,15 +99,35 @@ assert(json.aBoolean.asInt == None)
 
 See the [spec][1] for more examples.
 
+Also, for the `dijon.codec` an additional functionality is available when using [jsoniter-scala-core][2], like:
+* parsing/serialization from/to byte arrays, byte buffers, and input/output streams
+* parsing of [streamed JSON values](https://en.wikipedia.org/wiki/JSON_streaming) (concatenated or delimited by 
+  whitespace characters) and JSON arrays from input streams using callbacks without the need of holding a whole input in
+  the memory
+  
+See [jsoniter-scala-core spec][3] for more details and code samples.
+
 Usage
 ===
-Add the following to your `build.sbt` to use `dijon`:
+1. Add the following to your `build.sbt`:
 ```scala
 libraryDependency += "com.github.pathikrit" %% "dijon" % "0.2.4"
 ```
-Add import of the package objects of dijon:
+2. Turn on support of dynamic types by adding import clause:
+```scala
+import scala.language.dynamics._
+```
+or by setting the scala compiler option:
+```scala
+scalacOptions += "-language:dynamics"
+```
+3. Add import of the package object of `dijon` for the main functionality:
 ```scala
 import com.github.pathikrit.dijon._
+```
+4. Optionally, add import of package object of `jsoniter-scala-core` for an extended functionality:
+```scala
+import com.github.plokhotnyuk.jsoniter_scala.core._
 ```
 
 TODO
@@ -120,3 +140,5 @@ TODO
 * Remove warnings
 
 [1]: src/test/scala/com/github/pathikrit/dijon/DijonSpec.scala
+[2]: https://github.com/plokhotnyuk/jsoniter-scala/blob/master/jsoniter-scala-core/src/main/scala/com/github/plokhotnyuk/jsoniter_scala/core/package.scala
+[3]: https://github.com/plokhotnyuk/jsoniter-scala/blob/master/jsoniter-scala-core/src/test/scala/com/github/plokhotnyuk/jsoniter_scala/core/PackageSpec.scala

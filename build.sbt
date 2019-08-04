@@ -15,10 +15,7 @@ scalaVersion := "2.13.0"
 
 crossScalaVersions := Seq("2.11.12", "2.12.8", "2.13.0")
 
-scalacOptions ++= Seq(
-  "-unchecked", "-deprecation", "-feature",
-  "-language:postfixOps,implicitConversions,experimental.macros,dynamics,existentials,higherKinds"
-)
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:dynamics,higherKinds")
 
 libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.1",

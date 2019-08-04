@@ -35,7 +35,7 @@ class DijonSpec extends WordSpec with Matchers {
        }
      """
 
-    "parse objects" in {
+    "parse and serialize JSON objects" in {
       rick.name shouldBe name
 
       rick.age shouldBe age
@@ -122,7 +122,7 @@ class DijonSpec extends WordSpec with Matchers {
           |}""".stripMargin
     }
 
-    "parse arrays" in {
+    "parse and serialize JSON arrays" in {
       val empty = parse("[]")
       empty(0) shouldBe None
       empty shouldBe `[]`
@@ -155,7 +155,7 @@ class DijonSpec extends WordSpec with Matchers {
       arr.toMap shouldBe Map.empty
     }
 
-    "handle json upates" in {
+    "handle JSON updates" in {
       val (name, age, temperature) = ("Tigri", 7, 38.5)
       val cat = json"""
         {
@@ -245,7 +245,7 @@ class DijonSpec extends WordSpec with Matchers {
       val scala = json"""
         {
           "name": "scala",
-          "version": "2.10.3",
+          "version": "2.13.0",
           "features": {
             "functional": true,
             "awesome": true
@@ -264,10 +264,10 @@ class DijonSpec extends WordSpec with Matchers {
         }
       """
 
-      assert((scala ++ java) == json"""{"name": "java", "version": "2.10.3", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
-      assert((java ++ scala) == json"""{"name": "scala", "version": "2.10.3", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
+      assert((scala ++ java) == json"""{"name": "java", "version": "2.13.0", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
+      assert((java ++ scala) == json"""{"name": "scala", "version": "2.13.0", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
 
-      (scala ++ java).bugs shouldBe ((java ++ scala).bugs)
+      (scala ++ java).bugs shouldBe (java ++ scala).bugs
     }
 
     "be type-safeish" in {
@@ -304,7 +304,7 @@ class DijonSpec extends WordSpec with Matchers {
       langs.toMap shouldBe empty
     }
 
-    "not parse invalid jsons" in {
+    "not parse invalid JSON" in {
       val tests = Seq(
         "hi",
         "-",
@@ -317,7 +317,7 @@ class DijonSpec extends WordSpec with Matchers {
         "{'key': 98}",
         "{\"key\": 98\"}",
         "{\"key\": [98, 0}",
-        """ { "key": "hi""} """,           //http://stackoverflow.com/questions/15637429/
+        """ { "key": "hi""} """,
         "{\"foo\": 98 \"bar\": 0}"
       )
 
@@ -354,6 +354,8 @@ class DijonSpec extends WordSpec with Matchers {
       json ++ true shouldBe true
       json ++ 20 shouldBe 20
       20 ++ json shouldBe json
+      json ++ Math.PI shouldBe Math.PI
+      Math.PI ++ json shouldBe json
       json ++ "hi" shouldBe "hi"
       //"hi" ++ json shouldBe json
     }
@@ -393,7 +395,7 @@ class DijonSpec extends WordSpec with Matchers {
       map(`[]`) shouldBe 3
     }
 
-    "handle multiline strings correct" in {
+    "handle multi-line strings correct" in {
       val obj = `{}`
       obj.str = """my
                   |multiline
