@@ -104,6 +104,7 @@ Also, for the `dijon.codec` an additional functionality is available when using 
 * parsing of [streamed JSON values](https://en.wikipedia.org/wiki/JSON_streaming) (concatenated or delimited by 
   whitespace characters) and JSON arrays from input streams using callbacks without the need of holding a whole input in
   the memory
+* use a custom configuration for parsing and serializing  
   
 See [jsoniter-scala-core spec][3] for more details and code samples.
 
