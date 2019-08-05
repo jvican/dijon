@@ -68,22 +68,22 @@ package object dijon {
     }
 
     def asString: Option[String] = underlying match {
-      case x: String => Some(x)
+      case x: String => new Some(x)
       case _ => None
     }
 
     def asDouble: Option[Double] = underlying match {
-      case x: Double => Some(x)
+      case x: Double => new Some(x)
       case _ => None
     }
 
     def asInt: Option[Int] = underlying match {
-      case x: Int => Some(x)
+      case x: Int => new Some(x)
       case _ => None
     }
 
     def asBoolean: Option[Boolean] = underlying match {
-      case x: Boolean => Some(x)
+      case x: Boolean => new Some(x)
       case _ => None
     }
 
@@ -98,7 +98,7 @@ package object dijon {
     }
 
     def asNone: Option[None.type] = underlying match {
-      case x: None.type => Some(x)
+      case x: None.type => new Some(x)
       case _ => None
     }
 
