@@ -102,6 +102,20 @@ package object dijon {
       case _ => None
     }
 
+    def deepCopy: SomeJson = underlying match {
+      case arr: JsonArray =>
+        val res = new mutable.ArrayBuffer[SomeJson](arr.size)
+        arr.foreach(x => res += x.deepCopy)
+        res
+      case obj: JsonObject =>
+        val res = new util.LinkedHashMap[String, SomeJson](obj.size)
+        obj.foreach { case (k, v) =>
+          res.put(k, v.deepCopy)
+        }
+        res.asScala
+      case _ => this
+    }
+
     override def toString: String = compact(this)
 
     override def equals(obj: Any): Boolean = underlying == (obj match {

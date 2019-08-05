@@ -421,5 +421,15 @@ class DijonSpec extends WordSpec with Matchers {
       val obj = parse(jsonStr)
       obj.anInt shouldBe 1
     }
+
+    "do deep copy" in {
+      val json = json"""{"anObj":{"aString":"hi","anInt":1},"anArray":[2.0,{"aBoolean": true},null]}"""
+      assert(json.deepCopy ne json)
+      assert(json.deepCopy == json)
+      assert(json.deepCopy.anObj ne json.anObj)
+      assert(json.deepCopy.anObj == json.anObj)
+      assert(json.deepCopy.anArray ne json.anArray)
+      assert(json.deepCopy.anArray == json.anArray)
+    }
   }
 }
