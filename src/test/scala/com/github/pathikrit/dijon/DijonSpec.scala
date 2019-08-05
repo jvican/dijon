@@ -228,9 +228,6 @@ class DijonSpec extends WordSpec with Matchers {
       val t = json"""{"a":null,"b":{"c":null}}"""
       t.a shouldBe None
       t.b.c shouldBe None
-      val Some(a: None.type) = t.a.asNone
-      assert(a == None)
-      assert(t.b.asNone.isEmpty)
 
       val v = parse("""{"a": null}""")
       v.a shouldBe None

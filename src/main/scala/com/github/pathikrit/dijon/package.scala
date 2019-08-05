@@ -97,11 +97,6 @@ package object dijon {
       case _ => Map.empty
     }
 
-    def asNone: Option[None.type] = underlying match {
-      case x: None.type => new Some(x)
-      case _ => None
-    }
-
     def deepCopy: SomeJson = underlying match {
       case arr: JsonArray =>
         val res = new mutable.ArrayBuffer[SomeJson](arr.size)
