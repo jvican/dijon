@@ -44,6 +44,12 @@ mimaPreviousArtifacts := {
   else Set()
 }
 
+publishTo := Some(if (isSnapshot.value) Opts.resolver.sonatypeSnapshots else Opts.resolver.sonatypeStaging)
+
+publishMavenStyle := true
+
+pomIncludeRepository := { _ => false }
+
 pomExtra := {
   <url>http://github.com/pathikrit/dijon</url>
   <scm>
