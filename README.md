@@ -112,7 +112,7 @@ Usage
 ===
 1. Add the following to your `build.sbt`:
 ```scala
-libraryDependency += "com.github.pathikrit" %% "dijon" % "0.2.4"
+libraryDependency += "com.github.pathikrit" %% "dijon" % "0.3.0"
 ```
 2. Turn on support of dynamic types by adding import clause:
 ```scala
