@@ -49,7 +49,8 @@ cat.vet = vet                            // set the cat.vet to be the vet json o
 assert(cat.vet.phones(2) == phone)
 assert(cat.vet.address.zip == 94306)     // json deep access
 
-println(cat) // {"name" : "Tigri", "hobbies" : ["eating", "purring"], "vet" : {"address" : {"city" : "Palo Alto", "zip" : 94306, "name" : "Animal Hospital"}, "name" : "Dr. Kitty Specialist", "phones" : [null, null, "(650) 493-4233"]}, "is cat" : true, "age" : 7.0}
+println(cat) // {"name":"Tigri","age":7,"hobbies":["eating","purring"],"is cat":true,"vet":{"name":"Dr. Kitty Specialist","phones":[null,null,"(650) 493-4233"],"address":{"name":"Animal Hospital","city":"Palo Alto","zip":94306}}}
+
 assert(cat == parse(cat.toString))   // round-trip test
 
 var basicCat = cat -- "vet"                                  // remove 1 key
