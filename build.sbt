@@ -18,8 +18,8 @@ crossScalaVersions := Seq("2.11.12", "2.12.9", "2.13.0")
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:dynamics,higherKinds")
 
 libraryDependencies ++= Seq(
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "0.55.0",
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.2",
-  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "0.54.1",
   "org.scalatest" %% "scalatest" % "3.0.8" % Test
 )
 
