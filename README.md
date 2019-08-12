@@ -37,7 +37,7 @@ vet.name = "Dr. Kitty Specialist"   // set attributes in json object
 vet.phones = `[]`                   // create empty json array
 val phone = "(650) 493-4233"
 vet.phones(2) = phone               // set the 3rd item in array to this phone
-assert(vet.phones == mutable.Seq(null, null, phone))  // first 2 entries null
+assert(vet.phones == mutable.Seq(None, None, phone))  // first 2 entries None
 
 vet.address = `{}`
 vet.address.name = "Animal Hospital"
