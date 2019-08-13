@@ -22,24 +22,33 @@ package object dijon {
 
   implicit class Json[A : JsonType](val underlying: A) extends Dynamic {
     def selectDynamic(key: String): SomeJson = underlying match {
-      case obj: JsonObject if obj contains key => obj(key)
+      case obj: JsonObject => obj.get(key) match {
+        case Some(value) => value
+        case _ => None
+      }
       case _ => None
     }
 
     def updateDynamic(key: String)(value: SomeJson): Unit = underlying match {
-      case obj: JsonObject => obj(key) = value
+      case obj: JsonObject => obj += ((key, value))
       case _ => ()
     }
 
     def applyDynamic(key: String)(index: Int): SomeJson = underlying match {
-      case obj: JsonObject if obj contains key => obj(key)(index)
-      case arr: JsonArray if key == "apply" && (arr isDefinedAt index) => arr(index)
+      case obj: JsonObject => obj.get(key) match {
+        case Some(value) => value.underlying match {
+          case arr: JsonArray if arr.isDefinedAt(index) => arr(index)
+          case _ => None
+        }
+        case _ => None
+      }
+      case arr: JsonArray if key == "apply" && arr.isDefinedAt(index) => arr(index)
       case _ => None
     }
 
     def update(index: Int, value: SomeJson): Unit = underlying match {
       case arr: JsonArray if index >= 0 =>
-        while (arr.size <= index) {
+        while (arr.length <= index) {
           arr += None
         }
         arr(index) = value
@@ -99,7 +108,7 @@ package object dijon {
 
     def deepCopy: SomeJson = underlying match {
       case arr: JsonArray =>
-        val res = new mutable.ArrayBuffer[SomeJson](arr.size)
+        val res = new mutable.ArrayBuffer[SomeJson](arr.length)
         arr.foreach(x => res += x.deepCopy)
         res
       case obj: JsonObject =>
@@ -133,8 +142,7 @@ package object dijon {
 
   implicit val codec: JsonValueCodec[SomeJson] = new JsonValueCodec[SomeJson] {
     override def decodeValue(in: JsonReader, default: SomeJson): SomeJson = (in.nextToken(): @switch) match {
-      case 'n' =>
-        in.readNullOrError(default, "expected `null` value")
+      case 'n' => in.readNullOrError(default, "expected `null` value")
       case '"' =>
         in.rollbackToken()
         in.readString(null)
@@ -165,8 +173,7 @@ package object dijon {
           if (!in.isCurrentToken('}')) in.objectEndOrCommaError()
         }
         obj.asScala
-      case _ =>
-        in.decodeError("expected JSON value")
+      case _ => in.decodeError("expected JSON value")
     }
 
     override def encodeValue(x: SomeJson, out: JsonWriter): Unit = x.underlying match {

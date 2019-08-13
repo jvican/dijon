@@ -74,6 +74,7 @@ class DijonSpec extends WordSpec with Matchers {
 
       rick.hobbies(3) shouldBe None
       rick.hobbies(4) shouldBe None
+      rick.undefined(0) shouldBe None
 
       rick.toMap.keySet shouldBe Set("name", "age", "class", "contact", "is online", "weight", "hobbies", "toMap")
       rick.selectDynamic("toMap")(1) shouldBe 345
