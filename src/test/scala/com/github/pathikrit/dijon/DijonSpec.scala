@@ -2,9 +2,9 @@ package com.github.pathikrit.dijon
 
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderException
 import scala.collection.mutable
-import org.scalatest.FunSuite
+import verify._
 
-class DijonSpec extends FunSuite {
+object DijonSpec extends BasicTestSuite {
   val (email1, email2) = ("pathikritbhowmick@msn.com", "pathikrit.bhowmick@gmail.com")
   val (name, age) = ("Rick", 27)
 

@@ -20,8 +20,10 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:dynam
 libraryDependencies ++= Seq(
   "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "0.55.0",
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.2",
-  "org.scalatest" %% "scalatest" % "3.0.8" % Test
+  "com.eed3si9n.verify" %% "verify" % "0.1.0" % Test
 )
+
+testFrameworks += new TestFramework("verify.runner.Framework")
 
 mimaCheckDirection := {
   def isPatch: Boolean = {
