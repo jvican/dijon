@@ -73,6 +73,7 @@ class DijonSpec extends FunSuite {
 
     assert(rick.hobbies(3) == None)
     assert(rick.hobbies(4) == None)
+    assert(rick.undefined(0) == None)
 
     assert(rick.toMap.keySet == Set("name", "age", "class", "contact", "is online", "weight", "hobbies", "toMap"))
     assert(rick.selectDynamic("toMap")(1) == 345)
