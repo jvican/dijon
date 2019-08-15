@@ -82,8 +82,14 @@ val java = json"""
 }
 """
 
-assert((scala ++ java) == json"""{"name": "java", "version": "2.13.0", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
-assert((java ++ scala) == json"""{"name": "scala", "version": "2.13.0", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
+val scalaCopy = scala.deepCopy
+val javaCopy = java.deepCopy
+
+assert((scala ++ java) == json"""{"name":"java","version":"2.13.0","features":{"functional":[0,0],"terrible":true,"awesome":true},"bugs":213}""")
+assert((java ++ scala) == json"""{"name":"scala","version":"2.13.0","features":{"functional": true,"terrible":true,"awesome":true},"bugs":213}""")
+
+assert(scala == scalaCopy)       // original json objects stay untouched after merging
+assert(java == javaCopy)
 ```
 
 * [Union types](src/main/scala/com/github/pathikrit/dijon/UnionType.scala) for [type-safety](src/main/scala/com/github/pathikrit/dijon/package.scala#L11):

@@ -63,12 +63,12 @@ package object dijon {
           case key => res(key) = b(key)
         }
         res
-      case _ => that
+      case _ => that.deepCopy
     }
 
     def --(keys: String*): SomeJson = underlying match {
       case obj: JsonObject => obj -- keys
-      case _ => this
+      case _ => deepCopy
     }
 
     def remove(keys: String*): Unit = underlying match {

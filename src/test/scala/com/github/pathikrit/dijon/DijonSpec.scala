@@ -215,6 +215,8 @@ class DijonSpec extends FunSuite {
     cat.`is cat`.remove("something")     // do nothing
     vet.phones.remove("something")       // do nothing
 
+    val catCopy = cat.deepCopy
+
     var basicCat = cat -- "vet"                                  // remove 1 key
     basicCat = basicCat -- ("hobbies", "is cat", "paws")         // remove multiple keys ("paws" is not in cat)
     assert(basicCat == json"""{"name":"Tigri","temperature":38.5,"age": 7}""")   // after dropping some keys above
@@ -222,6 +224,14 @@ class DijonSpec extends FunSuite {
     assert(basicCat == json"""{"name": "Tigri","temperature":38.5}""")
 
     assert((cat.vet.address -- "city") == json"""{"name":"Animal Hospital","zip": 94306}""")
+
+    assert(cat == catCopy)               // original json objects stay untouched after removing keys by `--`
+
+    val jsonToMutate = json"[1,2,3]"
+    val removeResult = jsonToMutate -- "city"
+    assert(removeResult == jsonToMutate)
+    jsonToMutate(7) = 7
+    assert(removeResult != jsonToMutate)
   }
 
   test("handle nulls") {
@@ -261,10 +271,16 @@ class DijonSpec extends FunSuite {
       }
     """
 
-    assert((scala ++ java) == json"""{"name": "java", "version": "2.13.0", "features": { "functional": [0, 0], "terrible": true, "awesome": true}, "bugs": 213}""")
-    assert((java ++ scala) == json"""{"name": "scala", "version": "2.13.0", "features": { "functional": true, "terrible": true, "awesome": true}, "bugs": 213}""")
+    val scalaCopy = scala.deepCopy
+    val javaCopy = java.deepCopy
+
+    assert((scala ++ java) == json"""{"name":"java","version":"2.13.0","features":{"functional":[0,0],"terrible":true,"awesome":true},"bugs":213}""")
+    assert((java ++ scala) == json"""{"name":"scala","version":"2.13.0","features":{"functional": true,"terrible":true,"awesome":true},"bugs":213}""")
 
     assert((scala ++ java).bugs == (java ++ scala).bugs)
+
+    assert(scala == scalaCopy)       // original json objects stay untouched after merging
+    assert(java == javaCopy)
   }
 
   test("be type-safeish") {
@@ -354,7 +370,13 @@ class DijonSpec extends FunSuite {
     assert(json ++ Math.PI == Math.PI)
     assert(Math.PI ++ json == json)
     assert(json ++ "hi" == "hi")
-    //assert("hi" ++ json == json)
+    assert(Json("hi") ++ json == json)         //sometimes we have to resort to this "hi".++(json) won't compile
+
+    val jsonToMutate = json"""[1,2,3]"""
+    val mergeResult = json ++ jsonToMutate
+    jsonToMutate(0) = 7
+    assert(mergeResult != json ++ jsonToMutate)
+    assert(mergeResult == json"""[1,2,3]""")
   }
 
   test("ignore sets on primitives") {
