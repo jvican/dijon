@@ -248,7 +248,7 @@ class DijonSpec extends FunSuite {
     assert(t.b.c.a == None)
   }
 
-  test("handle merges") {
+  test("handle deep merges") {
     val scala = json"""
       {
         "name": "scala",
@@ -281,6 +281,15 @@ class DijonSpec extends FunSuite {
 
     assert(scala == scalaCopy)       // original json objects stay untouched after merging
     assert(java == javaCopy)
+
+    val ab = json"""{"a":{"b":[0,1]}}"""
+    val ac = json"""{"a":{"c":[1,2]}}"""
+    val `ab++ac` = ab ++ ac          // merge result should be not affected by subsequent mutation of arguments
+    ab.a.b(0) = json"""5"""
+    ac.a.c(0) = json"""3"""
+    assert(ab == json"""{"a":{"b":[5,1]}}""")
+    assert(ac == json"""{"a":{"c":[3,2]}}""")
+    assert(`ab++ac` == json"""{"a":{"b":[0,1],"c":[1,2]}}""")
   }
 
   test("be type-safeish") {
