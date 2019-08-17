@@ -75,7 +75,7 @@ class DijonSpec extends FunSuite {
     assert(rick.hobbies(4) == None)
     assert(rick.undefined(0) == None)
 
-    assert(rick.toMap.keySet == Set("name", "age", "class", "contact", "is online", "weight", "hobbies", "toMap"))
+    assert(rick.toMap.keysIterator.toSeq == List("name", "age", "class", "weight", "is online", "contact", "hobbies", "toMap"))
     assert(rick.selectDynamic("toMap")(1) == 345)
     assert(rick == parse(rick.toString)) // round-trip test
     assert(rick.toSeq.isEmpty == true)
@@ -184,7 +184,7 @@ class DijonSpec extends FunSuite {
     assert(cat.age.asBoolean.isEmpty)
 
     val catMap = cat.toMap                           // view as a hashmap
-    assert(catMap.keySet == Set("name", "age", "temperature", "hobbies", "is cat"))
+    assert(catMap.toMap.keysIterator.toSeq == Seq("name", "hobbies", "is cat", "temperature", "age"))
 
     assert(cat.hobbies(1) == "purring") // array access
     assert(cat.hobbies(100) == None)    // missing element
