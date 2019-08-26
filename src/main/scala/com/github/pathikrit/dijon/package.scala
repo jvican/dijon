@@ -57,22 +57,27 @@ package object dijon {
 
     def ++(that: SomeJson): SomeJson = (this.underlying, that.underlying) match {
       case (a: JsonObject, b: JsonObject) =>
-        val res = a.clone()
-        b.keys foreach {
-          case key if res contains key => res(key) = res(key) ++ b(key)
-          case key => res(key) = b(key)
+        val res = new util.LinkedHashMap[String, SomeJson](a.size + b.size)
+        a.foreach { case (k, v) =>
+          res.put(k, if (b.contains(k)) v ++ b(k) else v.deepCopy)
         }
-        res
+        b.foreach { case (k, v) =>
+          if (!res.containsKey(k)) res.put(k, v.deepCopy)
+        }
+        res.asScala
       case _ => that.deepCopy
     }
 
     def --(keys: String*): SomeJson = underlying match {
-      case obj: JsonObject => obj -- keys
+      case obj: JsonObject =>
+        val res = obj.clone()
+        keys.foreach(res -= _)
+        res.deepCopy
       case _ => deepCopy
     }
 
     def remove(keys: String*): Unit = underlying match {
-      case obj: JsonObject => obj --= keys
+      case obj: JsonObject => keys.foreach(obj -= _)
       case _ => ()
     }
 

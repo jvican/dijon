@@ -25,7 +25,7 @@ assert(catAge == age)
 assert(cat.age.asBoolean == None)
 
 val catMap = cat.toMap                           // view as a hashmap
-assert(catMap.keySet == Set("name", "age", "hobbies", "is cat"))
+assert(catMap.toMap.keysIterator.toSeq == Seq("name", "age", "hobbies", "is cat"))
 
 assert(cat.hobbies(1) == "purring") // array access
 assert(cat.hobbies(100) == None)    // missing element
