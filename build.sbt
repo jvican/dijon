@@ -11,6 +11,8 @@ licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 
 organization := "com.github.pathikrit"
 
+resolvers += Resolver.sonatypeRepo("staging")
+
 scalaVersion := "2.13.0"
 
 crossScalaVersions := Seq("2.11.12", "2.12.9", "2.13.0")
@@ -44,7 +46,7 @@ mimaPreviousArtifacts := {
   else Set()
 }
 
-publishTo := Some(if (isSnapshot.value) Opts.resolver.sonatypeSnapshots else Opts.resolver.sonatypeStaging)
+publishTo := sonatypePublishToBundle.value
 
 publishMavenStyle := true
 
