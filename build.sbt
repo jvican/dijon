@@ -11,6 +11,8 @@ licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 
 organization := "com.github.pathikrit"
 
+resolvers += Resolver.sonatypeRepo("staging")
+
 scalaVersion := "2.13.0"
 
 crossScalaVersions := Seq("2.11.12", "2.12.9", "2.13.0")
@@ -18,7 +20,7 @@ crossScalaVersions := Seq("2.11.12", "2.12.9", "2.13.0")
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:dynamics,higherKinds")
 
 libraryDependencies ++= Seq(
-  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "0.55.2",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "0.55.3",
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.2",
   "org.scalatest" %% "scalatest" % "3.0.8" % Test
 )
@@ -44,7 +46,7 @@ mimaPreviousArtifacts := {
   else Set()
 }
 
-publishTo := Some(if (isSnapshot.value) Opts.resolver.sonatypeSnapshots else Opts.resolver.sonatypeStaging)
+publishTo := sonatypePublishToBundle.value
 
 publishMavenStyle := true
 
