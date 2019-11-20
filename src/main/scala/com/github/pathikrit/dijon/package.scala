@@ -137,7 +137,7 @@ package object dijon {
 
   def compact(json: SomeJson): String = writeToString[SomeJson](json)
 
-  def pretty(json: SomeJson): String = writeToString[SomeJson](json, WriterConfig(indentionStep = 2))
+  def pretty(json: SomeJson): String = writeToString[SomeJson](json, WriterConfig.withIndentionStep(2))
 
   def parse(s: String): SomeJson = readFromString[SomeJson](s)
 
