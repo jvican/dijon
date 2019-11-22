@@ -13,14 +13,14 @@ organization := "com.github.pathikrit"
 
 resolvers += Resolver.sonatypeRepo("staging")
 
-scalaVersion := "2.13.0"
+scalaVersion := "2.13.1"
 
-crossScalaVersions := Seq("2.11.12", "2.12.9", "2.13.0")
+crossScalaVersions := Seq("2.11.12", "2.12.9", "2.13.1")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:dynamics,higherKinds")
 
 libraryDependencies ++= Seq(
-  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.0.1",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.0.2",
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.2",
   "org.scalatest" %% "scalatest" % "3.0.8" % Test
 )
