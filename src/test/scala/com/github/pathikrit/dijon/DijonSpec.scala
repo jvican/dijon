@@ -348,7 +348,15 @@ class DijonSpec extends AnyFunSuite {
     }
   }
 
-  test("parse empty object") {
+  test("parse an empty array") {
+    val arr = json"[]"
+    assert(arr.toString == "[]")
+    assert(arr == `[]`)
+    assert(arr.toMap == Map.empty)
+    assert(arr.toSeq == Nil)
+  }
+
+  test("parse an empty object") {
     val obj = json"{}"
     assert(obj.toString == "{}")
     assert(obj == `{}`)
