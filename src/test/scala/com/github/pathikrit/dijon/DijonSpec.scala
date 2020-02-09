@@ -1,6 +1,7 @@
 package com.github.pathikrit.dijon
 
-import com.github.plokhotnyuk.jsoniter_scala.core.JsonReaderException
+import com.github.plokhotnyuk.jsoniter_scala.core.{JsonReaderException, JsonWriterException}
+
 import scala.collection.mutable
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -326,25 +327,90 @@ class DijonSpec extends AnyFunSuite {
     assert(langs.toMap.isEmpty == true)
   }
 
-  test("not parse invalid JSON") {
+  test("do not parse invalid JSON") {
     val tests = Seq(
-      "hi",
-      "-",
-      "00",
-      "0-0",
-      "",
-      "{}}",
-      "[[]",
-      "{key: 98}",
-      "{'key': 98}",
-      "{\"key\": 98\"}",
-      "{\"key\": [98, 0}",
-      """ { "key": "hi""} """,
-      "{\"foo\": 98 \"bar\": 0}"
+      "hi" -> "expected JSON value, offset: 0x00000000",
+      "-" -> "unexpected end of input, offset: 0x00000001",
+      "00" -> "illegal number with leading zero, offset: 0x00000000",
+      "0-0" -> "expected end of input, offset: 0x00000001",
+      "" -> "unexpected end of input, offset: 0x00000000",
+      "{}}" -> "expected end of input, offset: 0x00000002",
+      "[[]" -> "unexpected end of input, offset: 0x00000003",
+      "{key: 98}" -> "expected '\"', offset: 0x00000001",
+      "{'key': 98}" -> "expected '\"', offset: 0x00000001",
+      "{\"key\": 98\"}" -> "expected '}' or ',', offset: 0x0000000a",
+      "{\"key\": [98, 0}" -> "expected ']' or ',', offset: 0x0000000e",
+      """ { "key": "hi""} """ -> "expected '}' or ',', offset: 0x0000000e",
+      "{\"foo\": 98 \"bar\": 0}" -> "expected '}' or ',', offset: 0x0000000b"
     )
 
-    for (str <- tests) {
-      intercept[JsonReaderException](parse(str))
+    for ((str, err) <- tests) {
+      assert(intercept[JsonReaderException](parse(str)).getMessage.startsWith(err))
+    }
+  }
+
+  test("do not parse too deeply nested JSON") {
+    val tests = Seq(
+      "[" * 129 + "]" * 129 -> "depth limit exceeded, offset: 0x00000080",
+      "{\"x\":" * 129 + "null" + "}" * 129 -> "depth limit exceeded, offset: 0x00000280",
+      "[{\"x\":" * 65 + "null" + "}]" * 65 -> "depth limit exceeded, offset: 0x00000180",
+      "{\"x\":[" * 65 + "]}" * 65 -> "depth limit exceeded, offset: 0x00000180"
+    )
+
+    for ((str, err) <- tests) {
+      assert(intercept[JsonReaderException](parse(str)).getMessage.startsWith(err))
+    }
+  }
+
+  test("do not serialize too deeply nested JSON") {
+    val tests = Seq({
+      val json = `{}`
+      json.x = parse("{\"x\":" * 128 + "null" + "}" * 128)
+      json
+    }, {
+      val json = `[]`
+      json(0) = parse("[" * 128 + "]" * 128)
+      json
+    })
+
+    for (json <- tests) {
+      assert(intercept[JsonWriterException](compact(json)).getMessage == "depth limit exceeded")
+    }
+  }
+
+  test("do not serialize circular references") {
+    intercept[StackOverflowError] {
+      case class A(a: A)              // immutability doesn't save from circular references
+
+      lazy val a1: A = A(a2)
+      lazy val a2 = A(a1)
+      a1.toString
+    }
+
+    val tests = Seq({
+      val json = `{}`
+      json.x = json
+      json
+    }, {
+      val json1 = `{}`
+      val json2 = `{}`
+      json1.x = json2
+      json2.y = json1
+      json1
+    }, {
+      val json = `[]`
+      json(0) = json
+      json
+    }, {
+      val json1 = `[]`
+      val json2 = `[]`
+      json1(0) = json2
+      json2(0) = json1
+      json1
+    })
+
+    for (json <- tests) {
+      assert(intercept[JsonWriterException](compact(json)).getMessage == "depth limit exceeded")
     }
   }
 
