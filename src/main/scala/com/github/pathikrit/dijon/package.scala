@@ -197,15 +197,19 @@ package object dijon {
       case arr: JsonArray =>
         if (depth <= 0) out.encodeError("depth limit exceeded")
         out.writeArrayStart()
-        val it = arr.iterator
         val dp = depth - 1
-        while (it.hasNext) encode(it.next(), out, dp)
+        val l = arr.size
+        var i = 0
+        while (i < l) {
+          encode(arr(i), out, dp)
+          i += 1
+        }
         out.writeArrayEnd()
       case obj: JsonObject =>
         if (depth <= 0) out.encodeError("depth limit exceeded")
         out.writeObjectStart()
-        val it = obj.iterator
         val dp = depth - 1
+        val it = obj.iterator
         while (it.hasNext) {
           val (k, v) = it.next()
           out.writeKey(k)
@@ -218,6 +222,6 @@ package object dijon {
   private[this] val prettyConfig = WriterConfig.withIndentionStep(2)
   private[this] val maxParsingDepth = Try(System.getProperty("dijon.maxParsingDepth", "128").toInt).getOrElse(128)
   private[this] val maxSerializationDepth = Try(System.getProperty("dijon.maxSerializationDepth", "128").toInt).getOrElse(128)
-  private[this] val initArrayCapacity = Try(System.getProperty("dijon.initArrayCapacity", "4").toInt).getOrElse(4)
-  private[this] val initMapCapacity = Try(System.getProperty("dijon.initMapCapacity", "4").toInt).getOrElse(4)
+  private[this] val initArrayCapacity = Try(System.getProperty("dijon.initArrayCapacity", "8").toInt).getOrElse(8)
+  private[this] val initMapCapacity = Try(System.getProperty("dijon.initMapCapacity", "8").toInt).getOrElse(8)
 }
