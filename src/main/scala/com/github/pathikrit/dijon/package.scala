@@ -1,13 +1,14 @@
 package com.github.pathikrit
 
+import java.nio.charset.StandardCharsets._
 import java.util
 
 import com.github.pathikrit.dijon.UnionType.{∅, ∨}
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
-import scala.annotation.switch
 import scala.jdk.CollectionConverters._
 import scala.collection.mutable
+import scala.util.Try
 
 package object dijon {
   type JsonTypes = ∅ ∨ String ∨ Int ∨ Double ∨ Boolean ∨ JsonArray ∨ JsonObject ∨ None.type
@@ -16,9 +17,9 @@ package object dijon {
   type JsonObject = mutable.Map[String, SomeJson]
   type JsonArray = mutable.Buffer[SomeJson]
 
-  def `{}`: SomeJson = new util.LinkedHashMap[String, SomeJson].asScala
+  def `[]`: SomeJson = new mutable.ArrayBuffer[SomeJson](initArrayCapacity)
 
-  def `[]`: SomeJson = new mutable.ArrayBuffer[SomeJson]
+  def `{}`: SomeJson = new util.LinkedHashMap[String, SomeJson](initMapCapacity).asScala
 
   implicit class Json[A : JsonType](val underlying: A) extends Dynamic {
     def selectDynamic(key: String): SomeJson = underlying match {
@@ -112,16 +113,11 @@ package object dijon {
     }
 
     def deepCopy: SomeJson = underlying match {
-      case arr: JsonArray =>
-        val res = new mutable.ArrayBuffer[SomeJson](arr.length)
-        arr.foreach(x => res += x.deepCopy)
+      case arr: JsonArray => arr.foldLeft(new mutable.ArrayBuffer[SomeJson](arr.length))((res, x) => res += x.deepCopy)
+      case obj: JsonObject => obj.foldLeft(new util.LinkedHashMap[String, SomeJson](obj.size)) { (res, kv) =>
+        res.put(kv._1, kv._2.deepCopy)
         res
-      case obj: JsonObject =>
-        val res = new util.LinkedHashMap[String, SomeJson](obj.size)
-        obj.foreach { case (k, v) =>
-          res.put(k, v.deepCopy)
-        }
-        res.asScala
+      }.asScala
       case _ => this
     }
 
@@ -135,71 +131,97 @@ package object dijon {
     override def hashCode: Int = underlying.hashCode
   }
 
-  def compact(json: SomeJson): String = writeToString[SomeJson](json)
+  def compact(json: SomeJson): String = new String(writeToArray[SomeJson](json), UTF_8)
 
-  def pretty(json: SomeJson): String = writeToString[SomeJson](json, WriterConfig.withIndentionStep(2))
+  def pretty(json: SomeJson): String = new String(writeToArray[SomeJson](json, prettyConfig), UTF_8)
 
-  def parse(s: String): SomeJson = readFromString[SomeJson](s)
+  def parse(s: String): SomeJson = readFromArray[SomeJson](s.getBytes(UTF_8))
 
   implicit class JsonStringContext(val sc: StringContext) extends AnyVal {
     def json(args: Any*): SomeJson = parse(sc.s(args: _*))
   }
 
   implicit val codec: JsonValueCodec[SomeJson] = new JsonValueCodec[SomeJson] {
-    override def decodeValue(in: JsonReader, default: SomeJson): SomeJson = (in.nextToken(): @switch) match {
-      case 'n' => in.readNullOrError(default, "expected `null` value")
-      case '"' =>
+    override def decodeValue(in: JsonReader, default: SomeJson): SomeJson = decode(in, maxParsingDepth)
+
+    override def encodeValue(x: SomeJson, out: JsonWriter): Unit = encode(x, out, maxSerializationDepth)
+
+    override val nullValue: SomeJson = None
+
+    private[this] def decode(in: JsonReader, depth: Int): SomeJson = {
+      val b = in.nextToken()
+      if (b == 'n') in.readNullOrError(None, "expected `null` value")
+      else if (b == '"') {
         in.rollbackToken()
         in.readString(null)
-      case 'f' | 't' =>
+      } else if (b == 't' || b == 'f') {
         in.rollbackToken()
         in.readBoolean()
-      case '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '-' =>
+      } else if ((b >= '0' && b <= '9') || b == '-') {
         in.rollbackToken()
         val d = in.readDouble()
         val i = d.toInt
         if (i.toDouble == d) i
         else d
-      case '[' =>
-        val arr = new mutable.ArrayBuffer[SomeJson]
+      } else if (b == '[') {
+        if (depth <= 0) in.decodeError("depth limit exceeded")
+        val arr = new mutable.ArrayBuffer[SomeJson](initArrayCapacity)
         if (!in.isNextToken(']')) {
           in.rollbackToken()
-          do arr += decodeValue(in, default)
+          val dp = depth - 1
+          do arr += decode(in, dp)
           while (in.isNextToken(','))
           if (!in.isCurrentToken(']')) in.arrayEndOrCommaError()
         }
         arr
-      case '{' =>
-        val obj = new util.LinkedHashMap[String, SomeJson]
+      } else if (b == '{') {
+        if (depth <= 0) in.decodeError("depth limit exceeded")
+        val obj = new util.LinkedHashMap[String, SomeJson](initMapCapacity)
         if (!in.isNextToken('}')) {
           in.rollbackToken()
-          do obj.put(in.readKeyAsString(), decodeValue(in, default))
+          val dp = depth - 1
+          do obj.put(in.readKeyAsString(), decode(in, dp))
           while (in.isNextToken(','))
           if (!in.isCurrentToken('}')) in.objectEndOrCommaError()
         }
         obj.asScala
-      case _ => in.decodeError("expected JSON value")
+      } else in.decodeError("expected JSON value")
     }
 
-    override def encodeValue(x: SomeJson, out: JsonWriter): Unit = x.underlying match {
+    private[this] def encode(x: SomeJson, out: JsonWriter, depth: Int): Unit = x.underlying match {
       case None => out.writeNull()
       case str: String => out.writeVal(str)
       case b: Boolean => out.writeVal(b)
       case i: Int => out.writeVal(i)
       case d: Double => out.writeVal(d)
       case arr: JsonArray =>
+        if (depth <= 0) out.encodeError("depth limit exceeded")
         out.writeArrayStart()
-        arr.foreach(v => encodeValue(v, out))
+        val dp = depth - 1
+        val l = arr.size
+        var i = 0
+        while (i < l) {
+          encode(arr(i), out, dp)
+          i += 1
+        }
         out.writeArrayEnd()
       case obj: JsonObject =>
+        if (depth <= 0) out.encodeError("depth limit exceeded")
         out.writeObjectStart()
-        obj.foreach { case (k, v) =>
+        val dp = depth - 1
+        val it = obj.iterator
+        while (it.hasNext) {
+          val (k, v) = it.next()
           out.writeKey(k)
-          encodeValue(v, out)
+          encode(v, out, dp)
         }
         out.writeObjectEnd()
     }
-
-    override val nullValue: SomeJson = None
   }
+
+  private[this] val prettyConfig = WriterConfig.withIndentionStep(2)
+  private[this] val maxParsingDepth = Try(System.getProperty("dijon.maxParsingDepth", "128").toInt).getOrElse(128)
+  private[this] val maxSerializationDepth = Try(System.getProperty("dijon.maxSerializationDepth", "128").toInt).getOrElse(128)
+  private[this] val initArrayCapacity = Try(System.getProperty("dijon.initArrayCapacity", "8").toInt).getOrElse(8)
+  private[this] val initMapCapacity = Try(System.getProperty("dijon.initMapCapacity", "8").toInt).getOrElse(8)
 }

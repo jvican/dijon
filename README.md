@@ -2,7 +2,7 @@
 
 dijon - Dynamic Json in Scala
 =====
-* Boiler-free json wrangling using Scala [Dynamic Types](https://www.scala-lang.org/api/2.13.0/scala/Dynamic.html)
+* Boiler-free json wrangling using Scala [Dynamic Types](https://www.scala-lang.org/api/2.13.2/scala/Dynamic.html)
 * Support of [RFC8259](https://tools.ietf.org/html/rfc8259) using a codec based on [jsoniter-scala-core][2] 
 * Less than 200 lines of code
 * Well [tested][1]
@@ -63,7 +63,7 @@ assert(basicCat == json"""{ "name": "Tigri", "age": 7}""")   // after dropping s
 val scala = json"""
 {
   "name": "scala",
-  "version": "2.13.0",
+  "version": "2.13.2",
   "features": {
     "functional": true,
     "awesome": true
@@ -85,8 +85,8 @@ val java = json"""
 val scalaCopy = scala.deepCopy
 val javaCopy = java.deepCopy
 
-assert((scala ++ java) == json"""{"name":"java","version":"2.13.0","features":{"functional":[0,0],"terrible":true,"awesome":true},"bugs":213}""")
-assert((java ++ scala) == json"""{"name":"scala","version":"2.13.0","features":{"functional": true,"terrible":true,"awesome":true},"bugs":213}""")
+assert((scala ++ java) == json"""{"name":"java","version":"2.13.2","features":{"functional":[0,0],"terrible":true,"awesome":true},"bugs":213}""")
+assert((java ++ scala) == json"""{"name":"scala","version":"2.13.2","features":{"functional": true,"terrible":true,"awesome":true},"bugs":213}""")
 
 assert(scala == scalaCopy)       // original json objects stay untouched after merging
 assert(java == javaCopy)
