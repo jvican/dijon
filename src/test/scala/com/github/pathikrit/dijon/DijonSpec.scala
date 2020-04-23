@@ -253,7 +253,7 @@ class DijonSpec extends AnyFunSuite {
     val scala = json"""
       {
         "name": "scala",
-        "version": "2.13.0",
+        "version": "2.13.2",
         "features": {
           "functional": true,
           "awesome": true
@@ -275,8 +275,8 @@ class DijonSpec extends AnyFunSuite {
     val scalaCopy = scala.deepCopy
     val javaCopy = java.deepCopy
 
-    assert((scala ++ java) == json"""{"name":"java","version":"2.13.0","features":{"functional":[0,0],"terrible":true,"awesome":true},"bugs":213}""")
-    assert((java ++ scala) == json"""{"name":"scala","version":"2.13.0","features":{"functional": true,"terrible":true,"awesome":true},"bugs":213}""")
+    assert((scala ++ java) == json"""{"name":"java","version":"2.13.2","features":{"functional":[0,0],"terrible":true,"awesome":true},"bugs":213}""")
+    assert((java ++ scala) == json"""{"name":"scala","version":"2.13.2","features":{"functional": true,"terrible":true,"awesome":true},"bugs":213}""")
 
     assert((scala ++ java).bugs == (java ++ scala).bugs)
 
