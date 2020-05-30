@@ -523,7 +523,12 @@ class DijonSpec extends AnyFunSuite {
     val obj = parse(jsonStr)
     assert(obj.anInt == 1)
   }
-
+  test("order of fields is ignored during comparison") {
+    val json1 = json"""{"a":1,"b":"2"}"""
+    val json2 = json"""{"b":"2","a":1}"""
+    assert(json1 ne json2)
+    assert(json1 == json2)
+  }
   test("do deep copy") {
     val json = json"""{"anObj":{"aString":"hi","anInt":1},"anArray":[2.0,{"aBoolean": true},null]}"""
     assert(json.deepCopy ne json)
