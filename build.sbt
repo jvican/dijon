@@ -13,9 +13,9 @@ organization := "com.github.pathikrit"
 
 resolvers += Resolver.sonatypeRepo("staging")
 
-scalaVersion := "2.13.2"
+scalaVersion := "2.13.3"
 
-crossScalaVersions := Seq("2.11.12", "2.12.10", "2.13.2")
+crossScalaVersions := Seq("2.11.12", "2.12.10", "2.13.3")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:existentials", "-language:dynamics,higherKinds")
 
