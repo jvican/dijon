@@ -11,6 +11,15 @@ licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 
 organization := "com.github.pathikrit"
 
+developers := List(
+  Developer(
+    id = "pathikrit",
+    name = "Pathikrit Bhowmick",
+    email = "pathikritbhowmick@msn.com",
+    url = new URL(s"http://github.com/pathikrit")
+  )
+)
+
 resolvers += Resolver.sonatypeRepo("staging")
 
 scalaVersion := "2.13.3"
@@ -44,25 +53,4 @@ mimaPreviousArtifacts := {
 
   if (isCheckingRequired) Set(organization.value %% moduleName.value % oldVersion)
   else Set()
-}
-
-publishTo := sonatypePublishToBundle.value
-
-publishMavenStyle := true
-
-pomIncludeRepository := { _ => false }
-
-pomExtra := {
-  <url>http://github.com/pathikrit/dijon</url>
-  <scm>
-    <url>git@github.com:pathikrit/dijon.git</url>
-    <connection>scm:git:git@github.com:pathikrit/dijon.git</connection>
-  </scm>
-  <developers>
-    <developer>
-      <id>pathikrit</id>
-      <name>Pathikrit Bhowmick</name>
-      <url>http://github.com/pathikrit</url>
-    </developer>
-  </developers>
 }

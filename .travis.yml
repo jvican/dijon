@@ -1,26 +1,43 @@
+os: linux
+
 language: scala
+
+jdk:
+  - openjdk8
+  - openjdk11
+
+scala:
+  - 2.11.12
+  - 2.12.11
+  - 2.13.3
+
 git:
-  depth: 100
+  depth: 100 # needed for binary compatibility checks
+
+before_install:
+  - git fetch --tags # needed to fetch tags
+
+jobs:
+  include:
+    - stage: test
+      script:
+        - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageAggregate mimaReportBinaryIssues
+        - curl -s https://codecov.io/bash | bash
+
+    - stage: release
+      if: ((branch = master AND type = push) OR (tag IS present)) AND NOT fork
+      jdk: openjdk8
+      scala: 2.13.3
+      script: sbt ci-release
+
+# Copied from https://www.scala-sbt.org/1.x/docs/Travis-CI-with-sbt.html#Caching
+before_cache:
+  - rm -fv $HOME/.ivy2/.sbt.ivy.lock
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
+  - find $HOME/.sbt        -name "*.lock"               -print -delete
+
 cache:
   directories:
     - $HOME/.cache/coursier
     - $HOME/.ivy2/cache
     - $HOME/.sbt
-before_cache:
-  # Cleanup locks to avoid unnecessary cache updates
-  - find $HOME/.sbt -name "*.lock" | xargs rm
-matrix:
-  include:
-    - os: linux
-      jdk: openjdk11
-      scala: 2.13.2
-    - os: linux
-      jdk: openjdk8
-      scala: 2.12.10
-    - os: linux
-      jdk: openjdk8
-      scala: 2.11.12
-script:
-  - sbt -batch ++$TRAVIS_SCALA_VERSION clean coverage test coverageAggregate mimaReportBinaryIssues
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
