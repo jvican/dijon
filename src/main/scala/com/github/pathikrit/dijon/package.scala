@@ -17,6 +17,21 @@ package object dijon {
   type JsonObject = mutable.Map[String, SomeJson]
   type JsonArray = mutable.Buffer[SomeJson]
 
+  type JsonIndexTypes = ∅ ∨ Int ∨ String
+  type JsonIndexType[B] = JsonIndexTypes#Member[B]
+
+  def JsonObject(values: (String, SomeJson)*): JsonObject = {
+    val map = new util.LinkedHashMap[String,SomeJson](values.length).asScala
+    for ((k,v) <- values) {
+      map.put(k,v)
+    }
+    map
+  }
+
+  def JsonArray(values: SomeJson*): JsonArray = {
+    mutable.ArrayBuffer[SomeJson](values: _*)
+  }
+
   def `[]`: SomeJson = new mutable.ArrayBuffer[SomeJson](initArrayCapacity)
 
   def `{}`: SomeJson = new util.LinkedHashMap[String, SomeJson](initMapCapacity).asScala
@@ -35,16 +50,39 @@ package object dijon {
       case _ => ()
     }
 
-    def applyDynamic(key: String)(index: Int): SomeJson = underlying match {
-      case obj: JsonObject => obj.get(key) match {
-        case Some(value) => value.underlying match {
-          case arr: JsonArray if arr.isDefinedAt(index) => arr(index)
+    def apply(index: Int): SomeJson = underlying match {
+      case arr: JsonArray if arr.isDefinedAt(index) => arr(index)
+      case _ => None
+    }
+
+    def apply(index: String): SomeJson = underlying match {
+      case obj: JsonObject if obj.contains(index) => obj(index)
+      case _ => None
+    }
+
+    def applyDynamic[B : JsonIndexType](key: String)(index: B): SomeJson = index match {
+      case index: Int => underlying match {
+        case obj: JsonObject => obj.get(key) match {
+          case Some(value) => value.underlying match {
+            case arr: JsonArray if arr.isDefinedAt(index) => arr(index)
+            case _ => None
+          }
           case _ => None
         }
+        case arr: JsonArray if key == "apply" && arr.isDefinedAt(index) => arr(index)
         case _ => None
       }
-      case arr: JsonArray if key == "apply" && arr.isDefinedAt(index) => arr(index)
-      case _ => None
+      case index: String => underlying match {
+        case obj: JsonObject if key != "apply" => obj.get(key) match {
+          case Some(value) => value.underlying match {
+            case obj2: JsonObject if obj2.contains(index) => obj2(index)
+            case _ => None
+          }
+          case _ => None
+        }
+        case obj: JsonObject if key == "apply" && obj.contains(index) => obj(index)
+        case _ => None
+      }
     }
 
     def update(index: Int, value: SomeJson): Unit = underlying match {
