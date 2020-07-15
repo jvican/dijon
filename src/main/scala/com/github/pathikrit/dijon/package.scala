@@ -17,9 +17,6 @@ package object dijon {
   type JsonObject = mutable.Map[String, SomeJson]
   type JsonArray = mutable.Buffer[SomeJson]
 
-  type JsonIndexTypes = ∅ ∨ Int ∨ String
-  type JsonIndexType[B] = JsonIndexTypes#Member[B]
-
   def JsonObject(values: (String, SomeJson)*): JsonObject = {
     val map = new util.LinkedHashMap[String,SomeJson](values.length).asScala
     for ((k,v) <- values) {
@@ -60,28 +57,30 @@ package object dijon {
       case _ => None
     }
 
-    def applyDynamic[B : JsonIndexType](key: String)(index: B): SomeJson = index match {
-      case index: Int => underlying match {
-        case obj: JsonObject => obj.get(key) match {
-          case Some(value) => value.underlying match {
-            case arr: JsonArray if arr.isDefinedAt(index) => arr(index)
+    def applyDynamic(key: String): JsonApplyDynamic = new JsonApplyDynamic(key)
+
+    class JsonApplyDynamic(key: String) {
+      def apply(index: Int): SomeJson = underlying match {
+          case obj: JsonObject => obj.get(key) match {
+            case Some(value) => value.underlying match {
+              case arr: JsonArray if arr.isDefinedAt(index) => arr(index)
+              case _ => None
+            }
             case _ => None
           }
+          case arr: JsonArray if key == "apply" && arr.isDefinedAt(index) => arr(index)
           case _ => None
-        }
-        case arr: JsonArray if key == "apply" && arr.isDefinedAt(index) => arr(index)
-        case _ => None
       }
-      case index: String => underlying match {
-        case obj: JsonObject if key != "apply" => obj.get(key) match {
-          case Some(value) => value.underlying match {
-            case obj2: JsonObject if obj2.contains(index) => obj2(index)
+      def apply(index: String): SomeJson = underlying match {
+          case obj: JsonObject if key != "apply" => obj.get(key) match {
+            case Some(value) => value.underlying match {
+              case obj2: JsonObject if obj2.contains(index) => obj2(index)
+              case _ => None
+            }
             case _ => None
           }
+          case obj: JsonObject if key == "apply" && obj.contains(index) => obj(index)
           case _ => None
-        }
-        case obj: JsonObject if key == "apply" && obj.contains(index) => obj(index)
-        case _ => None
       }
     }
 
