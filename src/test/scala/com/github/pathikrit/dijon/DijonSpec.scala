@@ -106,12 +106,12 @@ class DijonSpec extends AnyFunSuite {
        "hobbies"->JsonArray(
          "eating",
          JsonObject(
-           "games"->JsonObject("chess"->true, "football"->false),
+           "games"->JsonObject("chess"->true, "football"->false)
          ),
          JsonArray("coding", JsonArray("python", "scala")),
-         None,
+         None
         ),
-        "toMap"->JsonArray(23, 345, true),
+        "toMap"->JsonArray(23, 345, true)
      ).toString
     )
 
