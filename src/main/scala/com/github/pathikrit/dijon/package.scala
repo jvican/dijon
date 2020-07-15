@@ -17,7 +17,7 @@ package object dijon {
   type JsonObject = mutable.Map[String, SomeJson]
   type JsonArray = mutable.Buffer[SomeJson]
 
-  def JsonObject(values: (String, SomeJson)*): JsonObject = {
+  def JsonObject(values: (String, SomeJson)*): SomeJson = {
     val map = new util.LinkedHashMap[String,SomeJson](values.length).asScala
     for ((k,v) <- values) {
       map.put(k,v)
@@ -25,7 +25,7 @@ package object dijon {
     map
   }
 
-  def JsonArray(values: SomeJson*): JsonArray = {
+  def JsonArray(values: SomeJson*): SomeJson = {
     mutable.ArrayBuffer[SomeJson](values: _*)
   }
 

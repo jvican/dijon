@@ -81,6 +81,40 @@ class DijonSpec extends AnyFunSuite {
     assert(rick == parse(rick.toString)) // round-trip test
     assert(rick.toSeq.isEmpty == true)
 
+    assert(rick("hobbies")(2)(0) == "coding")
+    assert(rick("hobbies")(2)(1)(1) == "scala")
+    assert(rick("hobbies")(2)(100) == None)
+    assert(rick("hobbies")(1).games.football.asBoolean == Some(false))
+    assert(rick("hobbies")(1)("games").football.asInt == None)
+    assert(rick("hobbies")(1).games("foosball").asBoolean == None)
+    assert(rick("hobbies")(3) == None)
+    assert(rick("hobbies")(4) == None)
+    assert(rick("undefined")(0) == None)
+    assert(rick.toString == JsonObject(
+      "name"->name,
+      "age"->age,
+      "class"->"human",
+      "weight"->175.1,
+      "is online"->true,
+      "contact"->JsonObject(
+        "emails"->JsonArray(email1, email2),
+        "phone"->JsonObject(
+          "home"->"817-xxx-xxx",
+          "work"->"650-xxx-xxx"
+         )
+       ),
+       "hobbies"->JsonArray(
+         "eating",
+         JsonObject(
+           "games"->JsonObject("chess"->true, "football"->false),
+         ),
+         JsonArray("coding", JsonArray("python", "scala")),
+         None,
+        ),
+        "toMap"->JsonArray(23, 345, true),
+     ).toString
+    )
+
     assert(pretty(rick) ==
       """{
         |  "name": "Rick",
