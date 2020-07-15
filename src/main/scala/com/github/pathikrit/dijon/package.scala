@@ -93,6 +93,11 @@ package object dijon {
       case _ =>
     }
 
+    def update(index: String, value: SomeJson): Unit = underlying match {
+      case obj: JsonObject => obj(index) = value
+      case _ =>
+    }
+
     def ++(that: SomeJson): SomeJson = (this.underlying, that.underlying) match {
       case (a: JsonObject, b: JsonObject) =>
         val res = new util.LinkedHashMap[String, SomeJson](a.size + b.size)
