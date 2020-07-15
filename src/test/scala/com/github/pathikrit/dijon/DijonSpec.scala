@@ -118,7 +118,7 @@ class DijonSpec extends AnyFunSuite {
     val updateTest = `{}`
     updateTest("arr") = JsonArray(1,2,3)
     updateTest.obj = JsonObject("a"->1, "b"->2)
-    updateText("obj")("c") = 3
+    updateTest("obj")("c") = 3
     assert(updateTest.toString == """{"obj":{"a":1,"b":2,"c":3},"arr":[1,2,3]}""")
 
     assert(pretty(rick) ==
