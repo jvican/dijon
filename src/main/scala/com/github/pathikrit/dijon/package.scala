@@ -57,33 +57,32 @@ package object dijon {
       case _ => None
     }
 
-    def applyDynamic(key: String): JsonApplyDynamic = new JsonApplyDynamic(key)
-
-    class JsonApplyDynamic(key: String) {
-      def apply(index: Int): SomeJson = underlying match {
-          case obj: JsonObject => obj.get(key) match {
-            case Some(value) => value.underlying match {
-              case arr: JsonArray if arr.isDefinedAt(index) => arr(index)
-              case _ => None
-            }
+    def applyDynamic[B](key: String)(index: Any): SomeJson = index match {
+      case index: Int => underlying match {
+        case obj: JsonObject => obj.get(key) match {
+          case Some(value) => value.underlying match {
+            case arr: JsonArray if arr.isDefinedAt(index) => arr(index)
             case _ => None
           }
-          case arr: JsonArray if key == "apply" && arr.isDefinedAt(index) => arr(index)
           case _ => None
+        }
+        case arr: JsonArray if key == "apply" && arr.isDefinedAt(index) => arr(index)
+        case _ => None
       }
-      def apply(index: String): SomeJson = underlying match {
-          case obj: JsonObject if key != "apply" => obj.get(key) match {
-            case Some(value) => value.underlying match {
-              case obj2: JsonObject if obj2.contains(index) => obj2(index)
-              case _ => None
-            }
+      case index: String => underlying match {
+        case obj: JsonObject if key != "apply" => obj.get(key) match {
+          case Some(value) => value.underlying match {
+            case obj2: JsonObject if obj2.contains(index) => obj2(index)
             case _ => None
           }
-          case obj: JsonObject if key == "apply" && obj.contains(index) => obj(index)
           case _ => None
+        }
+        case obj: JsonObject if key == "apply" && obj.contains(index) => obj(index)
+        case _ => None
       }
+      case _ => None
     }
-
+    
     def update(index: Int, value: SomeJson): Unit = underlying match {
       case arr: JsonArray if index >= 0 =>
         while (arr.length <= index) {
