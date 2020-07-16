@@ -13,14 +13,12 @@ matrix:
   include:
     - os: linux
       jdk: openjdk11
-      scala: 2.13.2
+      scala: 2.13.3
     - os: linux
       jdk: openjdk8
-      scala: 2.12.10
+      scala: 2.12.12
     - os: linux
       jdk: openjdk8
       scala: 2.11.12
 script:
-  - sbt -batch ++$TRAVIS_SCALA_VERSION clean coverage test coverageAggregate mimaReportBinaryIssues
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - sbt -batch ++$TRAVIS_SCALA_VERSION clean coverage test mimaReportBinaryIssues coverageAggregate coveralls
