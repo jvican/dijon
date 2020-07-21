@@ -13,7 +13,7 @@ import scala.util.Try
 package object dijon {
   type JsonTypes = ∅ ∨ String ∨ Int ∨ Double ∨ Boolean ∨ JsonArray ∨ JsonObject ∨ None.type
   type JsonType[A] = JsonTypes#Member[A]
-  type SomeJson = Json[A] forSome {type A}
+  type SomeJson = Json[A] forSome { type A }
   type JsonObject = mutable.Map[String, SomeJson]
   type JsonArray = mutable.Buffer[SomeJson]
 
@@ -21,8 +21,31 @@ package object dijon {
 
   def `{}`: SomeJson = new util.LinkedHashMap[String, SomeJson](initMapCapacity).asScala
 
+  def JsonObject(values: (String, SomeJson)*): SomeJson = {
+    val len = values.length
+    var i = 0
+    val map = new util.LinkedHashMap[String, SomeJson](len)
+    while (i < len) {
+      val kv = values(i)
+      map.put(kv._1, kv._2)
+      i += 1
+    }
+    map.asScala
+  }
+
+  def JsonArray(values: SomeJson*): SomeJson = mutable.ArrayBuffer[SomeJson](values: _*)
+
   implicit class Json[A : JsonType](val underlying: A) extends Dynamic {
-    def selectDynamic(key: String): SomeJson = underlying match {
+    def selectDynamic(key: String): SomeJson = apply(key)
+
+    def updateDynamic(key: String)(value: SomeJson): Unit = update(key, value)
+
+    def applyDynamic[B](key1: String)(indexOrKey2: B): SomeJson = indexOrKey2 match {
+      case index: Int => underlying.apply(key1).apply(index)
+      case key2: String => underlying.apply(key1).apply(key2)
+    }
+
+    def apply(key: String): SomeJson = underlying match {
       case obj: JsonObject => obj.get(key) match {
         case Some(value) => value
         case _ => None
@@ -30,21 +53,14 @@ package object dijon {
       case _ => None
     }
 
-    def updateDynamic(key: String)(value: SomeJson): Unit = underlying match {
-      case obj: JsonObject => obj += ((key, value))
-      case _ => ()
+    def apply(index: Int): SomeJson = underlying match {
+      case arr: JsonArray if arr.isDefinedAt(index) => arr(index)
+      case _ => None
     }
 
-    def applyDynamic(key: String)(index: Int): SomeJson = underlying match {
-      case obj: JsonObject => obj.get(key) match {
-        case Some(value) => value.underlying match {
-          case arr: JsonArray if arr.isDefinedAt(index) => arr(index)
-          case _ => None
-        }
-        case _ => None
-      }
-      case arr: JsonArray if key == "apply" && arr.isDefinedAt(index) => arr(index)
-      case _ => None
+    def update(key: String, value: SomeJson): Unit = underlying match {
+      case obj: JsonObject => obj += ((key, value))
+      case _ => ()
     }
 
     def update(index: Int, value: SomeJson): Unit = underlying match {
@@ -53,7 +69,7 @@ package object dijon {
           arr += None
         }
         arr(index) = value
-      case _ =>
+      case _ => ()
     }
 
     def ++(that: SomeJson): SomeJson = (this.underlying, that.underlying) match {

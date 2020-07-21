@@ -5,7 +5,7 @@ dijon - Dynamic Json in Scala
 =====
 * Boiler-free json wrangling using Scala [Dynamic Types](https://www.scala-lang.org/api/2.13.2/scala/Dynamic.html)
 * Support of [RFC8259](https://tools.ietf.org/html/rfc8259) using a codec based on [jsoniter-scala-core][2] 
-* Less than 200 lines of code
+* Less than 250 lines of code
 * Well [tested][1]
 * Why yet another Scala json library? Well, code speaks more than thousand words:
 
@@ -103,6 +103,37 @@ json.anInt = 23                            // compiles
 val Some(i: Int) = json.anInt.asInt
 assert(i == 23)
 assert(json.aBoolean.asInt == None)
+```
+
+* `JsonObject()` and `JsonArray()` constructor functions for building up complex JSON values with less overhead:
+```scala
+val rick = JsonObject(
+  "name" -> name,
+  "age" -> age,
+  "class" -> "human",
+  "weight" -> 175.1,
+  "is online" -> true,
+  "contact" -> JsonObject(
+    "emails" -> JsonArray(email1, email2),
+    "phone" -> JsonObject(
+      "home" -> "817-xxx-xxx",
+      "work" -> "650-xxx-xxx"
+    )
+  ),
+  "hobbies" -> JsonArray(
+    "eating",
+    JsonObject(
+      "games" -> JsonObject(
+        "chess" -> true,
+        "football" -> false
+      )
+    ),
+    JsonArray("coding", JsonArray("python", "scala")),
+    None
+  ),
+  "toMap" -> JsonArray(23, 345, true),
+  "apply" -> 42
+)
 ```
 
 See the [spec][1] for more examples.

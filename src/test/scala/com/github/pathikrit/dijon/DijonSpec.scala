@@ -31,9 +31,40 @@ class DijonSpec extends AnyFunSuite {
          ["coding", ["python", "scala"]],
          null
         ],
-        "toMap": [23, 345, true]
+        "toMap": [23, 345, true],
+        "apply": 42
      }
    """
+
+  test("constructor functions for building up complex JSON values with less overhead") {
+    assert(rick == JsonObject(
+      "name" -> name,
+      "age" -> age,
+      "class" -> "human",
+      "weight" -> 175.1,
+      "is online" -> true,
+      "contact" -> JsonObject(
+        "emails" -> JsonArray(email1, email2),
+        "phone" -> JsonObject(
+          "home" -> "817-xxx-xxx",
+          "work" -> "650-xxx-xxx"
+        )
+      ),
+      "hobbies" -> JsonArray(
+        "eating",
+        JsonObject(
+          "games" -> JsonObject(
+            "chess" -> true,
+            "football" -> false
+          )
+        ),
+        JsonArray("coding", JsonArray("python", "scala")),
+        None
+      ),
+      "toMap" -> JsonArray(23, 345, true),
+      "apply" -> 42
+    ))
+  }
 
   test("parse and serialize JSON objects") {
     assert(rick.name == name)
@@ -76,10 +107,21 @@ class DijonSpec extends AnyFunSuite {
     assert(rick.hobbies(4) == None)
     assert(rick.undefined(0) == None)
 
-    assert(rick.toMap.keysIterator.toSeq == List("name", "age", "class", "weight", "is online", "contact", "hobbies", "toMap"))
+    assert(rick.toMap.keysIterator.toSeq == List("name", "age", "class", "weight", "is online", "contact", "hobbies", "toMap", "apply"))
     assert(rick.selectDynamic("toMap")(1) == 345)
-    assert(rick == parse(rick.toString)) // round-trip test
+    assert(rick == parse(rick.toString))                                  // round-trip test
     assert(rick.toSeq.isEmpty == true)
+
+    val h = "hobbies"
+    assert(rick(h)(2)(0) == "coding")
+    assert(rick(h)(2)(1)(1) == "scala")
+    assert(rick(h)(2)(100) == None)
+    assert(rick.hobbies(1)("games").football.asBoolean == Some(false))
+    assert(rick.hobbies(1)("games")("football").asBoolean == Some(false))
+    assert(rick.hobbies(1).games("football").asBoolean == Some(false))
+    assert(rick.selectDynamic("apply") == 42)                             // rick.apply won't compile
+    assert(rick("apply") == 42)                                           // rick.apply won't compile
+    assert(rick("undefined")(0) == None)
 
     assert(pretty(rick) ==
       """{
@@ -119,7 +161,8 @@ class DijonSpec extends AnyFunSuite {
         |    23,
         |    345,
         |    true
-        |  ]
+        |  ],
+        |  "apply": 42
         |}""".stripMargin)
   }
 
@@ -233,6 +276,12 @@ class DijonSpec extends AnyFunSuite {
     assert(removeResult == jsonToMutate)
     jsonToMutate(7) = 7
     assert(removeResult != jsonToMutate)
+
+    val updateTest = `{}`
+    updateTest.obj = JsonObject("a" -> 1, "b" -> 2)
+    updateTest("obj")("c") = 3
+    updateTest("arr") = JsonArray(1, 2, 3)
+    assert(updateTest == json"""{"obj":{"a":1,"b":2,"c":3},"arr":[1,2,3]}""")
   }
 
   test("handle nulls") {
@@ -486,7 +535,7 @@ class DijonSpec extends AnyFunSuite {
     val j1 = json"""{ "key" : 0 }"""
     val j2 = json"""{ "key" : "0" }"""
 
-    map(j1) =  0
+    map(j1) = 0
     map(j2) = 1
     map(`{}`) = 2
     map(`[]`) = 3
@@ -523,12 +572,14 @@ class DijonSpec extends AnyFunSuite {
     val obj = parse(jsonStr)
     assert(obj.anInt == 1)
   }
+
   test("order of fields is ignored during comparison") {
     val json1 = json"""{"a":1,"b":"2"}"""
     val json2 = json"""{"b":"2","a":1}"""
     assert(json1 ne json2)
     assert(json1 == json2)
   }
+
   test("do deep copy") {
     val json = json"""{"anObj":{"aString":"hi","anInt":1},"anArray":[2.0,{"aBoolean": true},null]}"""
     assert(json.deepCopy ne json)
