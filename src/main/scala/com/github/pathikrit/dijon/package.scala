@@ -21,7 +21,7 @@ package object dijon {
 
   def `{}`: SomeJson = new util.LinkedHashMap[String, SomeJson](initMapCapacity).asScala
 
-  def JsonObject(values: (String, SomeJson)*): SomeJson = {
+  def obj(values: (String, SomeJson)*): SomeJson = {
     val len = values.length
     var i = 0
     val map = new util.LinkedHashMap[String, SomeJson](len)
@@ -33,7 +33,7 @@ package object dijon {
     map.asScala
   }
 
-  def JsonArray(values: SomeJson*): SomeJson = mutable.ArrayBuffer[SomeJson](values: _*)
+  def arr(values: SomeJson*): SomeJson = mutable.ArrayBuffer[SomeJson](values: _*)
 
   implicit class Json[A : JsonType](val underlying: A) extends Dynamic {
     def selectDynamic(key: String): SomeJson = apply(key)

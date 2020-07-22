@@ -37,31 +37,31 @@ class DijonSpec extends AnyFunSuite {
    """
 
   test("constructor functions for building up complex JSON values with less overhead") {
-    assert(rick == JsonObject(
+    assert(rick == obj(
       "name" -> name,
       "age" -> age,
       "class" -> "human",
       "weight" -> 175.1,
       "is online" -> true,
-      "contact" -> JsonObject(
-        "emails" -> JsonArray(email1, email2),
-        "phone" -> JsonObject(
+      "contact" -> obj(
+        "emails" -> arr(email1, email2),
+        "phone" -> obj(
           "home" -> "817-xxx-xxx",
           "work" -> "650-xxx-xxx"
         )
       ),
-      "hobbies" -> JsonArray(
+      "hobbies" -> arr(
         "eating",
-        JsonObject(
-          "games" -> JsonObject(
+        obj(
+          "games" -> obj(
             "chess" -> true,
             "football" -> false
           )
         ),
-        JsonArray("coding", JsonArray("python", "scala")),
+        arr("coding", arr("python", "scala")),
         None
       ),
-      "toMap" -> JsonArray(23, 345, true),
+      "toMap" -> arr(23, 345, true),
       "apply" -> 42
     ))
   }
@@ -278,9 +278,9 @@ class DijonSpec extends AnyFunSuite {
     assert(removeResult != jsonToMutate)
 
     val updateTest = `{}`
-    updateTest.obj = JsonObject("a" -> 1, "b" -> 2)
+    updateTest.obj = obj("a" -> 1, "b" -> 2)
     updateTest("obj")("c") = 3
-    updateTest("arr") = JsonArray(1, 2, 3)
+    updateTest("arr") = arr(1, 2, 3)
     assert(updateTest == json"""{"obj":{"a":1,"b":2,"c":3},"arr":[1,2,3]}""")
   }
 

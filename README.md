@@ -1,13 +1,11 @@
 [![Build Status](https://travis-ci.org/pathikrit/dijon.png?branch=master)](http://travis-ci.org/pathikrit/dijon)
 [![Coverage Status](https://coveralls.io/repos/github/pathikrit/dijon/badge.svg?branch=master)](https://coveralls.io/github/pathikrit/dijon?branch=master)
 
-dijon - Dynamic Json in Scala
+dijon - Dynamic JSON in Scala
 =====
-* Boiler-free json wrangling using Scala [Dynamic Types](https://www.scala-lang.org/api/2.13.2/scala/Dynamic.html)
+* Boiler-free JSON wrangling using Scala [Dynamic Types](https://www.scala-lang.org/api/2.13.2/scala/Dynamic.html)
 * Support of [RFC8259](https://tools.ietf.org/html/rfc8259) using a codec based on [jsoniter-scala-core][2] 
-* Less than 250 lines of code
-* Well [tested][1]
-* Why yet another Scala json library? Well, code speaks more than thousand words:
+* Why yet another Scala JSON library? Well, code speaks more than thousand words:
 
 ```scala
 val (name, age) = ("Tigri", 7)
@@ -105,33 +103,33 @@ assert(i == 23)
 assert(json.aBoolean.asInt == None)
 ```
 
-* `JsonObject()` and `JsonArray()` constructor functions for building up complex JSON values with less overhead:
+* `obj()` and `arr()` constructor functions for building up complex JSON values with less overhead:
 ```scala
-val rick = JsonObject(
+val rick = obj(
   "name" -> name,
   "age" -> age,
   "class" -> "human",
   "weight" -> 175.1,
   "is online" -> true,
-  "contact" -> JsonObject(
-    "emails" -> JsonArray(email1, email2),
-    "phone" -> JsonObject(
+  "contact" -> obj(
+    "emails" -> arr(email1, email2),
+    "phone" -> obj(
       "home" -> "817-xxx-xxx",
       "work" -> "650-xxx-xxx"
     )
   ),
-  "hobbies" -> JsonArray(
+  "hobbies" -> arr(
     "eating",
-    JsonObject(
-      "games" -> JsonObject(
+    obj(
+      "games" -> obj(
         "chess" -> true,
         "football" -> false
       )
     ),
-    JsonArray("coding", JsonArray("python", "scala")),
+    arr("coding", arr("python", "scala")),
     None
   ),
-  "toMap" -> JsonArray(23, 345, true),
+  "toMap" -> arr(23, 345, true),
   "apply" -> 42
 )
 ```
