@@ -4,7 +4,7 @@
 dijon - Dynamic JSON in Scala
 =====
 * Boiler-free JSON wrangling using Scala [Dynamic Types](https://www.scala-lang.org/api/2.13.2/scala/Dynamic.html)
-* Support of [RFC8259](https://tools.ietf.org/html/rfc8259) using a codec based on [jsoniter-scala-core][2] 
+* Support of [RFC8259](https://tools.ietf.org/html/rfc8259) using a codec based on [jsoniter-scala-core][2] that [passes all JSONTestSuite checks](https://github.com/nst/JSONTestSuite/pull/99)
 * Why yet another Scala JSON library? Well, code speaks more than thousand words:
 
 ```scala
