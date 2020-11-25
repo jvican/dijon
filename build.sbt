@@ -21,7 +21,7 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:exist
 
 libraryDependencies ++= Seq(
   "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.6.2",
-  "org.scala-lang.modules" %% "scala-collection-compat" % "2.3.0",
+  "org.scala-lang.modules" %% "scala-collection-compat" % "2.3.1",
   "org.scalatest" %% "scalatest" % "3.2.3" % Test
 )
 
