@@ -9,13 +9,13 @@ description := "Boiler-free JSON wrangling using Scala dynamic types"
 
 licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 
-organization := "com.github.pathikrit"
+organization := "me.vican.jorge"
 
 resolvers += Resolver.sonatypeRepo("staging")
 
-scalaVersion := "2.13.3"
+scalaVersion := "2.13.4"
 
-crossScalaVersions := Seq("2.11.12", "2.12.12", "2.13.3")
+crossScalaVersions := Seq("2.11.12", "2.12.12", "2.13.4")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:existentials", "-language:dynamics,higherKinds")
 
