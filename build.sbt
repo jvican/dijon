@@ -45,24 +45,3 @@ mimaPreviousArtifacts := {
   if (isCheckingRequired) Set(organization.value %% moduleName.value % oldVersion)
   else Set()
 }
-
-publishTo := sonatypePublishToBundle.value
-
-publishMavenStyle := true
-
-pomIncludeRepository := { _ => false }
-
-pomExtra := {
-  <url>http://github.com/pathikrit/dijon</url>
-  <scm>
-    <url>git@github.com:pathikrit/dijon.git</url>
-    <connection>scm:git:git@github.com:pathikrit/dijon.git</connection>
-  </scm>
-  <developers>
-    <developer>
-      <id>pathikrit</id>
-      <name>Pathikrit Bhowmick</name>
-      <url>http://github.com/pathikrit</url>
-    </developer>
-  </developers>
-}
