@@ -13,6 +13,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         jdk: [zulu@1.8, graalvm-ce-java11@20.3.0, openjdk@1.15]
+        scala: [2.11.12, 2.12.12, 2.13.4]
     name: Test ${{ matrix.os }} -- ${{ matrix.jdk }}
     steps:
       - uses: actions/checkout@v2
@@ -36,6 +37,8 @@ jobs:
           ./bin/scalafmt --test
         shell: bash
       - name: Compile and test jsonrpc4s
+        env:
+          SCALA_VERSION: ${{ matrix.scala }}
         run: |
-          sbt +";clean;coverage;test;mimaReportBinaryIssues;coverageAggregate"
+          sbt ++$SCALA_VERSION clean coverage test mimaReportBinaryIssues coverageAggregate
         shell: bash
