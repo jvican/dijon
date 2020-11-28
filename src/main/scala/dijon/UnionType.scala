@@ -1,4 +1,4 @@
-package com.github.pathikrit.dijon
+package dijon
 
 /**
  * Union types using Curry-Howard isomorphism: http://stackoverflow.com/questions/3508077/
