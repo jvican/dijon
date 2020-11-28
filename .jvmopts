@@ -1,2 +1,0 @@
--XX:+UseParallelGC
--Dfile.encoding=UTF8
