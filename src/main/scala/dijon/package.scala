@@ -3,7 +3,7 @@ package dijon
 import java.nio.charset.StandardCharsets._
 import java.util
 
-import dijon.UnionType.{∅, ∨}
+import UnionType.{∅, ∨}
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 import scala.jdk.CollectionConverters._

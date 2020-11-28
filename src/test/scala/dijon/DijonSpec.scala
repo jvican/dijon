@@ -1,4 +1,6 @@
-package com.github.pathikrit.dijon
+package dijon
+
+import dijon._
 
 import com.github.plokhotnyuk.jsoniter_scala.core.{JsonReaderException, JsonWriterException}
 
@@ -37,33 +39,35 @@ class DijonSpec extends AnyFunSuite {
    """
 
   test("constructor functions for building up complex JSON values with less overhead") {
-    assert(rick == obj(
-      "name" -> name,
-      "age" -> age,
-      "class" -> "human",
-      "weight" -> 175.1,
-      "is online" -> true,
-      "contact" -> obj(
-        "emails" -> arr(email1, email2),
-        "phone" -> obj(
-          "home" -> "817-xxx-xxx",
-          "work" -> "650-xxx-xxx"
-        )
-      ),
-      "hobbies" -> arr(
-        "eating",
-        obj(
-          "games" -> obj(
-            "chess" -> true,
-            "football" -> false
+    assert(
+      rick == obj(
+        "name" -> name,
+        "age" -> age,
+        "class" -> "human",
+        "weight" -> 175.1,
+        "is online" -> true,
+        "contact" -> obj(
+          "emails" -> arr(email1, email2),
+          "phone" -> obj(
+            "home" -> "817-xxx-xxx",
+            "work" -> "650-xxx-xxx"
           )
         ),
-        arr("coding", arr("python", "scala")),
-        None
-      ),
-      "toMap" -> arr(23, 345, true),
-      "apply" -> 42
-    ))
+        "hobbies" -> arr(
+          "eating",
+          obj(
+            "games" -> obj(
+              "chess" -> true,
+              "football" -> false
+            )
+          ),
+          arr("coding", arr("python", "scala")),
+          None
+        ),
+        "toMap" -> arr(23, 345, true),
+        "apply" -> 42
+      )
+    )
   }
 
   test("parse and serialize JSON objects") {
@@ -107,9 +111,21 @@ class DijonSpec extends AnyFunSuite {
     assert(rick.hobbies(4) == None)
     assert(rick.undefined(0) == None)
 
-    assert(rick.toMap.keysIterator.toSeq == List("name", "age", "class", "weight", "is online", "contact", "hobbies", "toMap", "apply"))
+    assert(
+      rick.toMap.keysIterator.toSeq == List(
+        "name",
+        "age",
+        "class",
+        "weight",
+        "is online",
+        "contact",
+        "hobbies",
+        "toMap",
+        "apply"
+      )
+    )
     assert(rick.selectDynamic("toMap")(1) == 345)
-    assert(rick == parse(rick.toString))                                  // round-trip test
+    assert(rick == parse(rick.toString)) // round-trip test
     assert(rick.toSeq.isEmpty == true)
 
     val h = "hobbies"
@@ -119,51 +135,53 @@ class DijonSpec extends AnyFunSuite {
     assert(rick.hobbies(1)("games").football.asBoolean == Some(false))
     assert(rick.hobbies(1)("games")("football").asBoolean == Some(false))
     assert(rick.hobbies(1).games("football").asBoolean == Some(false))
-    assert(rick.selectDynamic("apply") == 42)                             // rick.apply won't compile
-    assert(rick("apply") == 42)                                           // rick.apply won't compile
+    assert(rick.selectDynamic("apply") == 42) // rick.apply won't compile
+    assert(rick("apply") == 42) // rick.apply won't compile
     assert(rick("undefined")(0) == None)
 
-    assert(pretty(rick) ==
-      """{
-        |  "name": "Rick",
-        |  "age": 27,
-        |  "class": "human",
-        |  "weight": 175.1,
-        |  "is online": true,
-        |  "contact": {
-        |    "emails": [
-        |      "pathikritbhowmick@msn.com",
-        |      "pathikrit.bhowmick@gmail.com"
-        |    ],
-        |    "phone": {
-        |      "home": "817-xxx-xxx",
-        |      "work": "650-xxx-xxx"
-        |    }
-        |  },
-        |  "hobbies": [
-        |    "eating",
-        |    {
-        |      "games": {
-        |        "chess": true,
-        |        "football": false
-        |      }
-        |    },
-        |    [
-        |      "coding",
-        |      [
-        |        "python",
-        |        "scala"
-        |      ]
-        |    ],
-        |    null
-        |  ],
-        |  "toMap": [
-        |    23,
-        |    345,
-        |    true
-        |  ],
-        |  "apply": 42
-        |}""".stripMargin)
+    assert(
+      pretty(rick) ==
+        """{
+          |  "name": "Rick",
+          |  "age": 27,
+          |  "class": "human",
+          |  "weight": 175.1,
+          |  "is online": true,
+          |  "contact": {
+          |    "emails": [
+          |      "pathikritbhowmick@msn.com",
+          |      "pathikrit.bhowmick@gmail.com"
+          |    ],
+          |    "phone": {
+          |      "home": "817-xxx-xxx",
+          |      "work": "650-xxx-xxx"
+          |    }
+          |  },
+          |  "hobbies": [
+          |    "eating",
+          |    {
+          |      "games": {
+          |        "chess": true,
+          |        "football": false
+          |      }
+          |    },
+          |    [
+          |      "coding",
+          |      [
+          |        "python",
+          |        "scala"
+          |      ]
+          |    ],
+          |    null
+          |  ],
+          |  "toMap": [
+          |    23,
+          |    345,
+          |    true
+          |  ],
+          |  "apply": 42
+          |}""".stripMargin
+    )
   }
 
   test("parse and serialize JSON arrays") {
@@ -210,7 +228,7 @@ class DijonSpec extends AnyFunSuite {
         "is cat": true
       }
     """
-    assert(cat.name == name)                         // dynamic type
+    assert(cat.name == name) // dynamic type
     val Some(catName: String) = cat.name.asString
     assert(catName == name)
     assert(cat.name.asBoolean.isEmpty)
@@ -227,49 +245,59 @@ class DijonSpec extends AnyFunSuite {
     assert(catTemp == temperature)
     assert(cat.age.asBoolean.isEmpty)
 
-    val catMap = cat.toMap                           // view as a hashmap
-    assert(catMap.toMap.keysIterator.toSeq == Seq("name", "hobbies", "is cat", "temperature", "age"))
+    val catMap = cat.toMap // view as a hashmap
+    assert(
+      catMap.toMap.keysIterator.toSeq == Seq("name", "hobbies", "is cat", "temperature", "age")
+    )
 
     assert(cat.hobbies(1) == "purring") // array access
-    assert(cat.hobbies(100) == None)    // missing element
-    assert(cat.`is cat` == true)        // keys with spaces/symbols/scala-keywords need to be escaped with ticks
-    assert(cat.email == None)           // missing key
+    assert(cat.hobbies(100) == None) // missing element
+    assert(
+      cat.`is cat` == true
+    ) // keys with spaces/symbols/scala-keywords need to be escaped with ticks
+    assert(cat.email == None) // missing key
 
-    val vet = `{}`                      // create empty json object
-    vet.name = "Dr. Kitty Specialist"   // set attributes in json object
-    vet.phones = `[]`                   // create empty json array
+    val vet = `{}` // create empty json object
+    vet.name = "Dr. Kitty Specialist" // set attributes in json object
+    vet.phones = `[]` // create empty json array
     val phone = "(650) 493-4233"
-    vet.phones(2) = phone               // set the 3rd item in array to this phone
-    assert(vet.phones == mutable.Seq(None, None, phone))  // first 2 entries None
+    vet.phones(2) = phone // set the 3rd item in array to this phone
+    assert(vet.phones == mutable.Seq(None, None, phone)) // first 2 entries None
 
     vet.address = `{}`
     vet.address.name = "Animal Hospital"
     vet.address.city = "Palo Alto"
     vet.address.zip = 94306
-    assert(vet.address == mutable.Map[String, SomeJson]("name" -> "Animal Hospital", "city" -> "Palo Alto", "zip" -> 94306))
+    assert(
+      vet.address == mutable
+        .Map[String, SomeJson]("name" -> "Animal Hospital", "city" -> "Palo Alto", "zip" -> 94306)
+    )
 
-    cat.vet = vet                            // set the cat.vet to be the vet json object we created above
+    cat.vet = vet // set the cat.vet to be the vet json object we created above
     assert(cat.vet.phones(2) == phone)
-    assert(cat.vet.address.zip == 94306)     // json deep access
+    assert(cat.vet.address.zip == 94306) // json deep access
 
-    assert(cat == parse(cat.toString))   // round-trip test
+    assert(cat == parse(cat.toString)) // round-trip test
 
-    cat.name.remove("something")         // do nothing
-    cat.age.remove("something")          // do nothing
-    cat.`is cat`.remove("something")     // do nothing
-    vet.phones.remove("something")       // do nothing
+    cat.name.remove("something") // do nothing
+    cat.age.remove("something") // do nothing
+    cat.`is cat`.remove("something") // do nothing
+    vet.phones.remove("something") // do nothing
 
     val catCopy = cat.deepCopy
 
-    var basicCat = cat -- "vet"                                  // remove 1 key
-    basicCat = basicCat -- ("hobbies", "is cat", "paws")         // remove multiple keys ("paws" is not in cat)
-    assert(basicCat == json"""{"name":"Tigri","temperature":38.5,"age": 7}""")   // after dropping some keys above
-    basicCat.remove("age")                                       // remove 1 key by mutating object
+    var basicCat = cat -- "vet" // remove 1 key
+    basicCat =
+      basicCat -- ("hobbies", "is cat", "paws") // remove multiple keys ("paws" is not in cat)
+    assert(
+      basicCat == json"""{"name":"Tigri","temperature":38.5,"age": 7}"""
+    ) // after dropping some keys above
+    basicCat.remove("age") // remove 1 key by mutating object
     assert(basicCat == json"""{"name": "Tigri","temperature":38.5}""")
 
     assert((cat.vet.address -- "city") == json"""{"name":"Animal Hospital","zip": 94306}""")
 
-    assert(cat == catCopy)               // original json objects stay untouched after removing keys by `--`
+    assert(cat == catCopy) // original json objects stay untouched after removing keys by `--`
 
     val jsonToMutate = json"[1,2,3]"
     val removeResult = jsonToMutate -- "city"
@@ -324,17 +352,22 @@ class DijonSpec extends AnyFunSuite {
     val scalaCopy = scala.deepCopy
     val javaCopy = java.deepCopy
 
-    assert((scala ++ java) == json"""{"name":"java","version":"2.13.2","features":{"functional":[0,0],"terrible":true,"awesome":true},"bugs":213}""")
-    assert((java ++ scala) == json"""{"name":"scala","version":"2.13.2","features":{"functional": true,"terrible":true,"awesome":true},"bugs":213}""")
+    assert(
+      (scala ++ java) == json"""{"name":"java","version":"2.13.2","features":{"functional":[0,0],"terrible":true,"awesome":true},"bugs":213}"""
+    )
+    assert(
+      (java ++ scala) == json"""{"name":"scala","version":"2.13.2","features":{"functional": true,"terrible":true,"awesome":true},"bugs":213}"""
+    )
 
     assert((scala ++ java).bugs == (java ++ scala).bugs)
 
-    assert(scala == scalaCopy)       // original json objects stay untouched after merging
+    assert(scala == scalaCopy) // original json objects stay untouched after merging
     assert(java == javaCopy)
 
     val ab = json"""{"a":{"b":[0,1]}}"""
     val ac = json"""{"a":{"c":[1,2]}}"""
-    val `ab++ac` = ab ++ ac          // merge result should be not affected by subsequent mutation of arguments
+    val `ab++ac` =
+      ab ++ ac // merge result should be not affected by subsequent mutation of arguments
     ab.a.b(0) = json"""5"""
     ac.a.c(0) = json"""3"""
     assert(ab == json"""{"a":{"b":[5,1]}}""")
@@ -349,9 +382,9 @@ class DijonSpec extends AnyFunSuite {
     assert(j.name.asInt == None)
 
     j = `{}`
-    j.aString = "hi"                        // compiles
-    j.aBoolean = true                       // compiles
-    j.anInt = 23                            // compiles
+    j.aString = "hi" // compiles
+    j.aBoolean = true // compiles
+    j.anInt = 23 // compiles
     //j.somethingElse = Option("hi")        // does not compile
     val Some(i: Int) = j.anInt.asInt
     assert(i == 23)
@@ -370,7 +403,9 @@ class DijonSpec extends AnyFunSuite {
     assert((langs(1)(-1)(-20)(-39) -- "foo") == None)
     langs(3) = `{}`
     langs(3).java = "sux"
-    assert(langs.toString == """["scala",["python2","python3",null,"python4"],null,{"java":"sux"},null,"F#"]""")
+    assert(
+      langs.toString == """["scala",["python2","python3",null,"python4"],null,{"java":"sux"},null,"F#"]"""
+    )
     assert(langs == parse(langs.toString))
     assert(langs(1).toSeq.size == 4)
     assert(langs.toMap.isEmpty == true)
@@ -412,15 +447,17 @@ class DijonSpec extends AnyFunSuite {
   }
 
   test("do not serialize too deeply nested JSON") {
-    val tests = Seq({
-      val json = `{}`
-      json.x = parse("{\"x\":" * 128 + "null" + "}" * 128)
-      json
-    }, {
-      val json = `[]`
-      json(0) = parse("[" * 128 + "]" * 128)
-      json
-    })
+    val tests = Seq(
+      {
+        val json = `{}`
+        json.x = parse("{\"x\":" * 128 + "null" + "}" * 128)
+        json
+      }, {
+        val json = `[]`
+        json(0) = parse("[" * 128 + "]" * 128)
+        json
+      }
+    )
 
     for (json <- tests) {
       assert(intercept[JsonWriterException](compact(json)).getMessage == "depth limit exceeded")
@@ -429,34 +466,36 @@ class DijonSpec extends AnyFunSuite {
 
   test("do not serialize circular references") {
     intercept[StackOverflowError] {
-      case class A(a: A)              // immutability doesn't save from circular references
+      case class A(a: A) // immutability doesn't save from circular references
 
       lazy val a1: A = A(a2)
       lazy val a2 = A(a1)
       a1.toString
     }
 
-    val tests = Seq({
-      val json = `{}`
-      json.x = json
-      json
-    }, {
-      val json1 = `{}`
-      val json2 = `{}`
-      json1.x = json2
-      json2.y = json1
-      json1
-    }, {
-      val json = `[]`
-      json(0) = json
-      json
-    }, {
-      val json1 = `[]`
-      val json2 = `[]`
-      json1(0) = json2
-      json2(0) = json1
-      json1
-    })
+    val tests = Seq(
+      {
+        val json = `{}`
+        json.x = json
+        json
+      }, {
+        val json1 = `{}`
+        val json2 = `{}`
+        json1.x = json2
+        json2.y = json1
+        json1
+      }, {
+        val json = `[]`
+        json(0) = json
+        json
+      }, {
+        val json1 = `[]`
+        val json2 = `[]`
+        json1(0) = json2
+        json2(0) = json1
+        json1
+      }
+    )
 
     for (json <- tests) {
       assert(intercept[JsonWriterException](compact(json)).getMessage == "depth limit exceeded")
@@ -485,7 +524,7 @@ class DijonSpec extends AnyFunSuite {
     assert(json.★ == 23)
     json.★ = "23"
     assert(json.★ == "23")
-    json.updateDynamic("+")(true)               //sometimes we have to resort to this json.+ won't compile
+    json.updateDynamic("+")(true) //sometimes we have to resort to this json.+ won't compile
     assert(json.selectDynamic("+") == true)
   }
 
@@ -502,7 +541,9 @@ class DijonSpec extends AnyFunSuite {
     assert(json ++ Math.PI == Math.PI)
     assert(Math.PI ++ json == json)
     assert(json ++ "hi" == "hi")
-    assert(Json("hi") ++ json == json)         //sometimes we have to resort to this "hi".++(json) won't compile
+    assert(
+      Json("hi") ++ json == json
+    ) //sometimes we have to resort to this "hi".++(json) won't compile
 
     val jsonToMutate = json"""[1,2,3]"""
     val mergeResult = json ++ jsonToMutate
@@ -581,7 +622,8 @@ class DijonSpec extends AnyFunSuite {
   }
 
   test("do deep copy") {
-    val json = json"""{"anObj":{"aString":"hi","anInt":1},"anArray":[2.0,{"aBoolean": true},null]}"""
+    val json =
+      json"""{"anObj":{"aString":"hi","anInt":1},"anArray":[2.0,{"aBoolean": true},null]}"""
     assert(json.deepCopy ne json)
     assert(json.deepCopy == json)
     assert(json.deepCopy.anObj ne json.anObj)
