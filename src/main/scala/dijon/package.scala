@@ -1,25 +1,23 @@
-package dijon
-
-import java.nio.charset.StandardCharsets._
-import java.util
-
-import UnionType.{∅, ∨}
-import com.github.plokhotnyuk.jsoniter_scala.core._
-
-import scala.jdk.CollectionConverters._
-import scala.collection.mutable
-import scala.util.Try
-
 package object dijon {
+  import java.nio.charset.StandardCharsets._
+  import java.util
+
+  import UnionType.{∅, ∨}
+  import com.github.plokhotnyuk.jsoniter_scala.core._
+
+  import scala.jdk.CollectionConverters._
+  import scala.collection.mutable
+  import scala.util.Try
+
   type JsonTypes = ∅ ∨ String ∨ Int ∨ Double ∨ Boolean ∨ JsonArray ∨ JsonObject ∨ None.type
   type JsonType[A] = JsonTypes#Member[A]
   type SomeJson = Json[A] forSome { type A }
   type JsonObject = mutable.Map[String, SomeJson]
   type JsonArray = mutable.Buffer[SomeJson]
 
-  def `[]`: SomeJson = new mutable.ArrayBuffer[SomeJson](initArrayCapacity)
+  def `[]` : SomeJson = new mutable.ArrayBuffer[SomeJson](initArrayCapacity)
 
-  def `{}`: SomeJson = new util.LinkedHashMap[String, SomeJson](initMapCapacity).asScala
+  def `{}` : SomeJson = new util.LinkedHashMap[String, SomeJson](initMapCapacity).asScala
 
   def obj(values: (String, SomeJson)*): SomeJson = {
     val len = values.length
@@ -35,7 +33,7 @@ package object dijon {
 
   def arr(values: SomeJson*): SomeJson = mutable.ArrayBuffer[SomeJson](values: _*)
 
-  implicit class Json[A : JsonType](val underlying: A) extends Dynamic {
+  implicit class Json[A: JsonType](val underlying: A) extends Dynamic {
     def selectDynamic(key: String): SomeJson = apply(key)
 
     def updateDynamic(key: String)(value: SomeJson): Unit = update(key, value)
@@ -46,10 +44,11 @@ package object dijon {
     }
 
     def apply(key: String): SomeJson = underlying match {
-      case obj: JsonObject => obj.get(key) match {
-        case Some(value) => value
-        case _ => None
-      }
+      case obj: JsonObject =>
+        obj.get(key) match {
+          case Some(value) => value
+          case _ => None
+        }
       case _ => None
     }
 
@@ -129,11 +128,15 @@ package object dijon {
     }
 
     def deepCopy: SomeJson = underlying match {
-      case arr: JsonArray => arr.foldLeft(new mutable.ArrayBuffer[SomeJson](arr.length))((res, x) => res += x.deepCopy)
-      case obj: JsonObject => obj.foldLeft(new util.LinkedHashMap[String, SomeJson](obj.size)) { (res, kv) =>
-        res.put(kv._1, kv._2.deepCopy)
-        res
-      }.asScala
+      case arr: JsonArray =>
+        arr.foldLeft(new mutable.ArrayBuffer[SomeJson](arr.length))((res, x) => res += x.deepCopy)
+      case obj: JsonObject =>
+        obj
+          .foldLeft(new util.LinkedHashMap[String, SomeJson](obj.size)) { (res, kv) =>
+            res.put(kv._1, kv._2.deepCopy)
+            res
+          }
+          .asScala
       case _ => this
     }
 
@@ -158,9 +161,11 @@ package object dijon {
   }
 
   implicit val codec: JsonValueCodec[SomeJson] = new JsonValueCodec[SomeJson] {
-    override def decodeValue(in: JsonReader, default: SomeJson): SomeJson = decode(in, maxParsingDepth)
+    override def decodeValue(in: JsonReader, default: SomeJson): SomeJson =
+      decode(in, maxParsingDepth)
 
-    override def encodeValue(x: SomeJson, out: JsonWriter): Unit = encode(x, out, maxSerializationDepth)
+    override def encodeValue(x: SomeJson, out: JsonWriter): Unit =
+      encode(x, out, maxSerializationDepth)
 
     override val nullValue: SomeJson = None
 
@@ -185,8 +190,7 @@ package object dijon {
         if (!in.isNextToken(']')) {
           in.rollbackToken()
           val dp = depth - 1
-          do arr += decode(in, dp)
-          while (in.isNextToken(','))
+          do arr += decode(in, dp) while (in.isNextToken(','))
           if (!in.isCurrentToken(']')) in.arrayEndOrCommaError()
         }
         arr
@@ -196,8 +200,7 @@ package object dijon {
         if (!in.isNextToken('}')) {
           in.rollbackToken()
           val dp = depth - 1
-          do obj.put(in.readKeyAsString(), decode(in, dp))
-          while (in.isNextToken(','))
+          do obj.put(in.readKeyAsString(), decode(in, dp)) while (in.isNextToken(','))
           if (!in.isCurrentToken('}')) in.objectEndOrCommaError()
         }
         obj.asScala
@@ -236,8 +239,12 @@ package object dijon {
   }
 
   private[this] val prettyConfig = WriterConfig.withIndentionStep(2)
-  private[this] val maxParsingDepth = Try(System.getProperty("dijon.maxParsingDepth", "128").toInt).getOrElse(128)
-  private[this] val maxSerializationDepth = Try(System.getProperty("dijon.maxSerializationDepth", "128").toInt).getOrElse(128)
-  private[this] val initArrayCapacity = Try(System.getProperty("dijon.initArrayCapacity", "8").toInt).getOrElse(8)
-  private[this] val initMapCapacity = Try(System.getProperty("dijon.initMapCapacity", "8").toInt).getOrElse(8)
+  private[this] val maxParsingDepth =
+    Try(System.getProperty("dijon.maxParsingDepth", "128").toInt).getOrElse(128)
+  private[this] val maxSerializationDepth =
+    Try(System.getProperty("dijon.maxSerializationDepth", "128").toInt).getOrElse(128)
+  private[this] val initArrayCapacity =
+    Try(System.getProperty("dijon.initArrayCapacity", "8").toInt).getOrElse(8)
+  private[this] val initMapCapacity =
+    Try(System.getProperty("dijon.initMapCapacity", "8").toInt).getOrElse(8)
 }

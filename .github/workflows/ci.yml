@@ -1,0 +1,39 @@
+name: Continuous Integration
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        jdk: [zulu@1.8, graalvm-ce-java11@20.3.0, openjdk@1.15]
+    name: Test ${{ matrix.os }} -- ${{ matrix.jdk }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: coursier/cache-action@v3
+      - uses: olafurpg/setup-scala@v10
+        with:
+          java-version: ${{ matrix.jdk }}
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - name: Set up environment
+        run: |
+          curl -Lo coursier https://git.io/coursier-cli && chmod +x coursier && ./coursier --help
+          java -version
+        shell: bash
+      - name: Check formatting
+        if: matrix.os != 'windows-latest'
+        run: |
+          ./bin/scalafmt --test
+      - name: Compile and test jsonrpc4s
+        run: |
+        sbt +";clean;coverage;test;mimaReportBinaryIssues;coverageAggregate"

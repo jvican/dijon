@@ -1,7 +1,5 @@
 package dijon
 
-import dijon._
-
 import com.github.plokhotnyuk.jsoniter_scala.core.{JsonReaderException, JsonWriterException}
 
 import scala.collection.mutable

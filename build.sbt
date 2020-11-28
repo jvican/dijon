@@ -11,13 +11,17 @@ licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 
 organization := "me.vican.jorge"
 
-resolvers += Resolver.sonatypeRepo("staging")
-
 scalaVersion := "2.13.4"
 
 crossScalaVersions := Seq("2.11.12", "2.12.12", "2.13.4")
 
-scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:existentials", "-language:dynamics,higherKinds")
+scalacOptions ++= Seq(
+  "-unchecked",
+  "-deprecation",
+  "-feature",
+  "-language:existentials",
+  "-language:dynamics,higherKinds"
+)
 
 libraryDependencies ++= Seq(
   "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.6.2",
@@ -42,6 +46,7 @@ mimaPreviousArtifacts := {
     newMajor == oldMajor && (newMajor != "0" || newMinor == oldMinor)
   }
 
-  if (isCheckingRequired) Set(organization.value %% moduleName.value % oldVersion)
+  if (oldVersion == "0.3.0") Set()
+  else if (isCheckingRequired) Set(organization.value %% moduleName.value % oldVersion)
   else Set()
 }
