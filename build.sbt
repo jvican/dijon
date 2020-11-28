@@ -58,8 +58,6 @@ libraryDependencies ++= Seq(
 
 mimaCheckDirection := {
   def isPatch: Boolean = {
-    println(version.value)
-    println(version.value.split('.'))
     val Array(newMajor, newMinor, _) = version.value.split('.')
     val Array(oldMajor, oldMinor, _) = oldVersion.split('.')
     newMajor == oldMajor && newMinor == oldMinor
