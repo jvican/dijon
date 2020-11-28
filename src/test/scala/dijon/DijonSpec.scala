@@ -6,6 +6,7 @@ import scala.collection.mutable
 import org.scalatest.funsuite.AnyFunSuite
 
 class DijonSpec extends AnyFunSuite {
+  val isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0
   val (email1, email2) = ("pathikritbhowmick@msn.com", "pathikrit.bhowmick@gmail.com")
   val (name, age) = ("Rick", 27)
 
@@ -137,49 +138,49 @@ class DijonSpec extends AnyFunSuite {
     assert(rick("apply") == 42) // rick.apply won't compile
     assert(rick("undefined")(0) == None)
 
-    assert(
-      pretty(rick) ==
-        """{
-          |  "name": "Rick",
-          |  "age": 27,
-          |  "class": "human",
-          |  "weight": 175.1,
-          |  "is online": true,
-          |  "contact": {
-          |    "emails": [
-          |      "pathikritbhowmick@msn.com",
-          |      "pathikrit.bhowmick@gmail.com"
-          |    ],
-          |    "phone": {
-          |      "home": "817-xxx-xxx",
-          |      "work": "650-xxx-xxx"
-          |    }
-          |  },
-          |  "hobbies": [
-          |    "eating",
-          |    {
-          |      "games": {
-          |        "chess": true,
-          |        "football": false
-          |      }
-          |    },
-          |    [
-          |      "coding",
-          |      [
-          |        "python",
-          |        "scala"
-          |      ]
-          |    ],
-          |    null
-          |  ],
-          |  "toMap": [
-          |    23,
-          |    345,
-          |    true
-          |  ],
-          |  "apply": 42
-          |}""".stripMargin
-    )
+    val expected =
+      """{
+        |  "name": "Rick",
+        |  "age": 27,
+        |  "class": "human",
+        |  "weight": 175.1,
+        |  "is online": true,
+        |  "contact": {
+        |    "emails": [
+        |      "pathikritbhowmick@msn.com",
+        |      "pathikrit.bhowmick@gmail.com"
+        |    ],
+        |    "phone": {
+        |      "home": "817-xxx-xxx",
+        |      "work": "650-xxx-xxx"
+        |    }
+        |  },
+        |  "hobbies": [
+        |    "eating",
+        |    {
+        |      "games": {
+        |        "chess": true,
+        |        "football": false
+        |      }
+        |    },
+        |    [
+        |      "coding",
+        |      [
+        |        "python",
+        |        "scala"
+        |      ]
+        |    ],
+        |    null
+        |  ],
+        |  "toMap": [
+        |    23,
+        |    345,
+        |    true
+        |  ],
+        |  "apply": 42
+        |}""".stripMargin
+
+    assert(pretty(rick) == expected.replace("\n", System.lineSeparator()))
   }
 
   test("parse and serialize JSON arrays") {
@@ -586,11 +587,15 @@ class DijonSpec extends AnyFunSuite {
   }
 
   test("handle multi-line strings correct") {
+    val nl = System.lineSeparator()
     val obj = `{}`
     obj.str = """my
                 |multiline
                 |string""".stripMargin
-    assert(obj.str.toString == raw""""my\nmultiline\nstring"""")
+    val expected =
+      if (isWindows) raw""""my\r\nmultiline\r\nstring""""
+      else raw""""my\nmultiline\nstring""""
+    assert(obj.str.toString == expected)
   }
 
   test("handle quotes in string keys") {
