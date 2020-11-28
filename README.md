@@ -1,3 +1,5 @@
+![Continuous Integration](https://github.com/jvican/dijon/workflows/Continuous%20Integration/badge.svg?branch=master)
+
 dijon - Dynamic JSON in Scala
 =====
 * Boiler-free JSON wrangling using Scala [Dynamic Types](https://www.scala-lang.org/api/2.13.2/scala/Dynamic.html)
