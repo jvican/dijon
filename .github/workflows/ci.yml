@@ -36,4 +36,4 @@ jobs:
           ./bin/scalafmt --test
       - name: Compile and test jsonrpc4s
         run: |
-        sbt +";clean;coverage;test;mimaReportBinaryIssues;coverageAggregate"
+          sbt +";clean;coverage;test;mimaReportBinaryIssues;coverageAggregate"
