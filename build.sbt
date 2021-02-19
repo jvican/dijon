@@ -54,7 +54,7 @@ scalacOptions ++= Seq(
 libraryDependencies ++= Seq(
   "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.6.4",
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.2",
-  "org.scalatest" %% "scalatest" % "3.2.3" % Test
+  "org.scalatest" %% "scalatest" % "3.2.5" % Test
 )
 
 mimaCheckDirection := {
