@@ -14,7 +14,7 @@ organization := "me.vican.jorge"
 // Update .github/workflows/ci.yml when changing this
 scalaVersion := "2.13.4"
 // Update .github/workflows/ci.yml when changing this
-crossScalaVersions := Seq("2.11.12", "2.12.12", "2.13.4")
+crossScalaVersions := Seq("2.11.12", "2.12.13", "2.13.4")
 
 homepage := Some(url("https://github.com/jvican/dijon"))
 licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
