@@ -52,7 +52,7 @@ scalacOptions ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.6.4",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core" % "2.7.0",
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.2",
   "org.scalatest" %% "scalatest" % "3.2.6" % Test
 )
