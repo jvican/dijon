@@ -90,7 +90,7 @@ assert(scala == scalaCopy)       // original json objects stay untouched after m
 assert(java == javaCopy)
 ```
 
-* [Union types](src/main/scala/dijon/UnionType.scala) for [type-safety](src/main/scala/dijon/package.scala#L11):
+* [Union types](dijon/src/main/scala/dijon/UnionType.scala) for [type-safety](dijon/src/main/scala/dijon/package.scala#L11):
 ```scala
 val json = `{}`
 json.aString = "hi"                        // compiles
@@ -175,6 +175,6 @@ TODO
 * Macro for type inference to induce compile-time errors where possible
 * JSON string interpolator fills in braces, quotes and commas etc
 
-[1]: src/test/scala/dijon/DijonSpec.scala
+[1]: dijon/src/test/scala/dijon/DijonSpec.scala
 [2]: https://github.com/plokhotnyuk/jsoniter-scala/blob/master/jsoniter-scala-core/src/main/scala/com/github/plokhotnyuk/jsoniter_scala/core/package.scala
 [3]: https://github.com/plokhotnyuk/jsoniter-scala/blob/master/jsoniter-scala-core/src/test/scala/com/github/plokhotnyuk/jsoniter_scala/core/PackageSpec.scala

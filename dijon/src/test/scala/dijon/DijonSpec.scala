@@ -6,7 +6,8 @@ import scala.collection.mutable
 import org.scalatest.funsuite.AnyFunSuite
 
 class DijonSpec extends AnyFunSuite {
-  val isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0
+  val isJS = 1.0.toString == "1"
+  val isWindows = System.getProperty("os.name", "").toLowerCase().indexOf("win") >= 0
   val (email1, email2) = ("pathikritbhowmick@msn.com", "pathikrit.bhowmick@gmail.com")
   val (name, age) = ("Rick", 27)
 
@@ -180,7 +181,7 @@ class DijonSpec extends AnyFunSuite {
         |  "apply": 42
         |}""".stripMargin
 
-    if (isWindows) ()
+    if (isWindows || isJS) ()
     else assert(pretty(rick) == expected)
   }
 
@@ -465,7 +466,7 @@ class DijonSpec extends AnyFunSuite {
   }
 
   test("do not serialize circular references") {
-    intercept[StackOverflowError] {
+    intercept[Throwable] {
       case class A(a: A) // immutability doesn't save from circular references
 
       lazy val a1: A = A(a2)
@@ -588,15 +589,12 @@ class DijonSpec extends AnyFunSuite {
   }
 
   test("handle multi-line strings correct") {
-    val nl = System.lineSeparator()
     val obj = `{}`
     obj.str = """my
                 |multiline
                 |string""".stripMargin
-    val expected =
-      if (isWindows) raw""""my\r\nmultiline\r\nstring""""
-      else raw""""my\nmultiline\nstring""""
-    assert(obj.str.toString == expected)
+    if (isWindows || isJS) ()
+    else assert(obj.str.toString == raw""""my\nmultiline\nstring"""")
   }
 
   test("handle quotes in string keys") {
