@@ -58,8 +58,9 @@ lazy val publishSettings = Seq(
       newMajor == oldMajor && (newMajor != "0" || newMinor == oldMinor)
     }
 
-    if (oldVersion == "0.3.0") Set()
-    else if (isCheckingRequired) Set(organization.value %% moduleName.value % oldVersion)
+    if (oldVersion == "0.5.0")
+      Set() // FIXME: Remove after adding Scala.js support for Scala 2.12.x and 2.11.x
+    else if (isCheckingRequired) Set(organization.value %%% moduleName.value % oldVersion)
     else Set()
   }
 )
@@ -78,11 +79,6 @@ lazy val root = project
 lazy val dijonJVM = dijon.jvm
 
 lazy val dijonJS = dijon.js
-  .settings(
-    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)
-      .withESFeatures(_.withUseECMAScript2015(false))),
-    coverageEnabled := false // FIXME: No support for Scala.js 1.0 yet, see https://github.com/scoverage/scalac-scoverage-plugin/pull/287
-  )
 
 lazy val dijon = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
@@ -90,14 +86,26 @@ lazy val dijon = crossProject(JVMPlatform, JSPlatform)
   .settings(publishSettings)
   .settings(
     scalaVersion := "2.13.5", // Update .github/workflows/ci.yml when changing this
-    crossScalaVersions := Seq(
-      "2.11.12",
-      "2.12.13",
-      "2.13.5"
-    ), // Update .github/workflows/ci.yml when changing this
     libraryDependencies ++= Seq(
       "com.github.plokhotnyuk.jsoniter-scala" %%% "jsoniter-scala-core" % "2.7.1",
       "org.scala-lang.modules" %%% "scala-collection-compat" % "2.4.3",
       "org.scalatest" %%% "scalatest" % "3.2.7" % Test
     )
+  )
+  .jvmSettings(
+    crossScalaVersions := Seq(
+      "2.11.12",
+      "2.12.13",
+      "2.13.5"
+    ) // Update .github/workflows/ci.yml when changing this
+  )
+  .jsSettings(
+    crossScalaVersions := Seq(
+      "2.11.12",
+      "2.12.13",
+      "2.13.5"
+    ), // Update .github/workflows/ci.yml when changing this
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)
+      .withESFeatures(_.withUseECMAScript2015(false))),
+    coverageEnabled := false // FIXME: No support for Scala.js 1.0 yet, see https://github.com/scoverage/scalac-scoverage-plugin/pull/287
   )
