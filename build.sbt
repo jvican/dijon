@@ -42,6 +42,7 @@ lazy val commonSettings = Seq(
 )
 
 lazy val publishSettings = Seq(
+  packageOptions += Package.ManifestAttributes("Automatic-Module-Name" -> moduleName.value),
   mimaCheckDirection := {
     def isPatch: Boolean = {
       val Array(newMajor, newMinor, _) = version.value.split('.')
@@ -58,9 +59,7 @@ lazy val publishSettings = Seq(
       newMajor == oldMajor && (newMajor != "0" || newMinor == oldMinor)
     }
 
-    if (oldVersion == "0.5.0")
-      Set() // FIXME: Remove after adding Scala.js support for Scala 2.12.x and 2.11.x
-    else if (isCheckingRequired) Set(organization.value %%% moduleName.value % oldVersion)
+    if (isCheckingRequired) Set(organization.value %%% moduleName.value % oldVersion)
     else Set()
   }
 )
