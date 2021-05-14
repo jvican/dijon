@@ -59,8 +59,9 @@ lazy val publishSettings = Seq(
       newMajor == oldMajor && (newMajor != "0" || newMinor == oldMinor)
     }
 
-    if (isCheckingRequired) Set(organization.value %%% moduleName.value % oldVersion)
-    else Set()
+    if (isCheckingRequired && (oldVersion != "0.5.0" || scalaVersion.value == "2.13.5")) {
+      Set(organization.value %%% moduleName.value % oldVersion)
+    } else Set()
   }
 )
 
@@ -86,8 +87,8 @@ lazy val dijon = crossProject(JVMPlatform, JSPlatform)
   .settings(
     scalaVersion := "2.13.5", // Update .github/workflows/ci.yml when changing this
     libraryDependencies ++= Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %%% "jsoniter-scala-core" % "2.8.0",
-      "org.scala-lang.modules" %%% "scala-collection-compat" % "2.4.3",
+      "com.github.plokhotnyuk.jsoniter-scala" %%% "jsoniter-scala-core" % "2.8.1",
+      "org.scala-lang.modules" %%% "scala-collection-compat" % "2.4.4",
       "org.scalatest" %%% "scalatest" % "3.2.8" % Test
     )
   )
