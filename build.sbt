@@ -59,8 +59,9 @@ lazy val publishSettings = Seq(
       newMajor == oldMajor && (newMajor != "0" || newMinor == oldMinor)
     }
 
-    if (isCheckingRequired) Set(organization.value %%% moduleName.value % oldVersion)
-    else Set()
+    if (isCheckingRequired && (oldVersion != "0.5.0" || scalaVersion.value == "2.13.5")) {
+      Set(organization.value %%% moduleName.value % oldVersion)
+    } else Set()
   }
 )
 
