@@ -19,8 +19,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: coursier/cache-action@v3
-      - uses: olafurpg/setup-scala@v10
+      - uses: coursier/cache-action@v5
+      - uses: olafurpg/setup-scala@v12
         with:
           java-version: ${{ matrix.jdk }}
       - uses: actions/setup-node@v1
