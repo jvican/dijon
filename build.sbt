@@ -87,7 +87,7 @@ lazy val dijon = crossProject(JVMPlatform, JSPlatform)
   .settings(
     scalaVersion := "2.13.6", // Update .github/workflows/ci.yml when changing this
     libraryDependencies ++= Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %%% "jsoniter-scala-core" % "2.9.0",
+      "com.github.plokhotnyuk.jsoniter-scala" %%% "jsoniter-scala-core" % "2.9.1",
       "org.scala-lang.modules" %%% "scala-collection-compat" % "2.4.4",
       "org.scalatest" %%% "scalatest" % "3.2.9" % Test
     )
