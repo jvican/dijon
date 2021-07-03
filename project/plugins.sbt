@@ -4,7 +4,7 @@ resolvers += Resolver.bintrayIvyRepo("sbt", "sbt-plugin-releases")
 val scalaJSVersion =
   Option(System.getenv("SCALAJS_VERSION")).getOrElse("1.6.0")
 
-addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.0.0")
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.1.0")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJSVersion)
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.1.1")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.8.2")
