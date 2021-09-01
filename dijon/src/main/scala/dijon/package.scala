@@ -150,11 +150,11 @@ package object dijon {
     override def hashCode: Int = underlying.hashCode
   }
 
-  def compact(json: SomeJson): String = new String(writeToArray[SomeJson](json), UTF_8)
+  def compact(json: SomeJson): String = writeToString[SomeJson](json)
 
-  def pretty(json: SomeJson): String = new String(writeToArray[SomeJson](json, prettyConfig), UTF_8)
+  def pretty(json: SomeJson): String = writeToString[SomeJson](json, prettyConfig)
 
-  def parse(s: String): SomeJson = readFromArray[SomeJson](s.getBytes(UTF_8))
+  def parse(s: String): SomeJson = readFromString[SomeJson](s)
 
   implicit class JsonStringContext(val sc: StringContext) extends AnyVal {
     def json(args: Any*): SomeJson = parse(sc.s(args: _*))
