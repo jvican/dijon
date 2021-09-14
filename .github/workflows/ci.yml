@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         jdk: [zulu@1.8, graalvm-ce-java11@20.3.0, openjdk@1.15]
-        scala: [2.11.12, 2.12.14, 2.13.6]
+        scala: [2.11.12, 2.12.15, 2.13.6]
     name: Test ${{ matrix.os }} -- ${{ matrix.jdk }}
     steps:
       - uses: actions/checkout@v2
