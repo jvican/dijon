@@ -148,7 +148,7 @@ Usage
 ===
 1. Add the following to your `build.sbt`:
 ```scala
-libraryDependency += "me.vican.jorge" %% "dijon" % "0.5.0" // Use %%% instead of %% for Scala.js
+libraryDependency += "me.vican.jorge" %% "dijon" % "0.6.0" // Use %%% instead of %% for Scala.js
 ```
 2. Turn on support of dynamic types by adding import clause:
 ```scala
