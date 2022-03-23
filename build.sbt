@@ -80,7 +80,9 @@ lazy val dijonJVM = dijon.jvm
 
 lazy val dijonJS = dijon.js
 
-lazy val dijon = crossProject(JVMPlatform, JSPlatform)
+lazy val dijonNative = dijon.native
+
+lazy val dijon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .settings(commonSettings)
   .settings(publishSettings)
@@ -108,4 +110,10 @@ lazy val dijon = crossProject(JVMPlatform, JSPlatform)
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)
       .withESFeatures(_.withUseECMAScript2015(false))),
     coverageEnabled := false // FIXME: No support for Scala.js 1.0 yet, see https://github.com/scoverage/scalac-scoverage-plugin/pull/287
+  )
+  .nativeSettings(
+    crossScalaVersions := Seq(
+      "2.12.13",
+      "2.13.6"
+    ) // Update .github/workflows/ci.yml when changing this
   )
