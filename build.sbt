@@ -52,7 +52,8 @@ lazy val publishSettings = Seq(
       newMajor == oldMajor && newMinor == oldMinor
     }
 
-    if (isPatch) "both" else "backward"
+    if (isPatch) "both"
+    else "backward"
   },
   mimaPreviousArtifacts := {
     def isCheckingRequired: Boolean = {
@@ -61,9 +62,8 @@ lazy val publishSettings = Seq(
       newMajor == oldMajor && (newMajor != "0" || newMinor == oldMinor)
     }
 
-    if (isCheckingRequired && (oldVersion != "0.5.0" || scalaVersion.value == "2.13.6")) {
-      Set(organization.value %%% moduleName.value % oldVersion)
-    } else Set()
+    if (isCheckingRequired) Set(organization.value %%% moduleName.value % oldVersion)
+    else Set()
   }
 )
 
