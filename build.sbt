@@ -1,3 +1,5 @@
+import org.scalajs.linker.interface.{CheckedBehavior, ESVersion}
+
 import scala.util._
 import scala.sys.process._
 
@@ -107,8 +109,16 @@ lazy val dijon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       "2.12.13",
       "2.13.6"
     ), // Update .github/workflows/ci.yml when changing this
-    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)
-      .withESFeatures(_.withUseECMAScript2015(false))),
+    scalaJSLinkerConfig ~= {
+      _.withSemantics({
+        _.optimized
+          .withProductionMode(true)
+          .withAsInstanceOfs(CheckedBehavior.Unchecked)
+          .withArrayIndexOutOfBounds(CheckedBehavior.Unchecked)
+      }).withClosureCompiler(true)
+        .withESFeatures(_.withESVersion(ESVersion.ES2015))
+        .withModuleKind(ModuleKind.CommonJSModule)
+    },
     coverageEnabled := false // FIXME: No support for Scala.js 1.0 yet, see https://github.com/scoverage/scalac-scoverage-plugin/pull/287
   )
   .nativeSettings(
