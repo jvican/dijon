@@ -171,8 +171,7 @@ package object dijon {
 
     private[this] def decode(in: JsonReader, depth: Int): SomeJson = {
       val b = in.nextToken()
-      if (b == 'n') in.readNullOrError(None, "expected `null` value")
-      else if (b == '"') {
+      if (b == '"') {
         in.rollbackToken()
         in.readString(null)
       } else if (b == 't' || b == 'f') {
@@ -204,11 +203,10 @@ package object dijon {
           if (!in.isCurrentToken('}')) in.objectEndOrCommaError()
         }
         obj.asScala
-      } else in.decodeError("expected JSON value")
+      } else in.readNullOrError(None, "expected JSON value")
     }
 
     private[this] def encode(x: SomeJson, out: JsonWriter, depth: Int): Unit = x.underlying match {
-      case None => out.writeNull()
       case str: String => out.writeVal(str)
       case b: Boolean => out.writeVal(b)
       case i: Int => out.writeVal(i)
@@ -235,6 +233,7 @@ package object dijon {
           encode(v, out, dp)
         }
         out.writeObjectEnd()
+      case _ => out.writeNull()
     }
   }
 
