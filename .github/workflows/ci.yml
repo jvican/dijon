@@ -12,8 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        jdk: [zulu@1.8, graalvm-ce-java11@20.3.0, openjdk@1.15]
-        scala: [2.12.14, 2.13.6]
+        jdk: [graalvm-ce-java11, openjdk@1.17]
+        scala: [2.12.17, 2.13.8]
     name: Test ${{ matrix.os }} -- ${{ matrix.jdk }}
     steps:
       - uses: actions/checkout@v2

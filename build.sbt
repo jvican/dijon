@@ -89,26 +89,18 @@ lazy val dijon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(
-    scalaVersion := "2.13.6", // Update .github/workflows/ci.yml when changing this
+    scalaVersion := "2.13.8", // Update .github/workflows/ci.yml when changing this
+    crossScalaVersions := Seq(
+      "2.12.17",
+      "2.13.8"
+    ), // Update .github/workflows/ci.yml when changing this
     libraryDependencies ++= Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %%% "jsoniter-scala-core" % "2.13.3",
+      "com.github.plokhotnyuk.jsoniter-scala" %%% "jsoniter-scala-core" % "2.17.4",
       "org.scala-lang.modules" %%% "scala-collection-compat" % "2.8.1",
-      "org.scalatest" %%% "scalatest" % "3.2.12" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.13" % Test
     )
   )
-  .jvmSettings(
-    crossScalaVersions := Seq(
-      "2.11.12",
-      "2.12.13",
-      "2.13.6"
-    ) // Update .github/workflows/ci.yml when changing this
-  )
   .jsSettings(
-    crossScalaVersions := Seq(
-      "2.11.12",
-      "2.12.13",
-      "2.13.6"
-    ), // Update .github/workflows/ci.yml when changing this
     scalaJSLinkerConfig ~= {
       _.withSemantics({
         _.optimized
@@ -120,10 +112,4 @@ lazy val dijon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         .withModuleKind(ModuleKind.CommonJSModule)
     },
     coverageEnabled := false // FIXME: No support for Scala.js 1.0 yet, see https://github.com/scoverage/scalac-scoverage-plugin/pull/287
-  )
-  .nativeSettings(
-    crossScalaVersions := Seq(
-      "2.12.13",
-      "2.13.6"
-    ) // Update .github/workflows/ci.yml when changing this
   )
