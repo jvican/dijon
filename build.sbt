@@ -39,8 +39,8 @@ lazy val commonSettings = Seq(
     "-language:existentials",
     "-language:dynamics,higherKinds"
   ),
-  publishTo := sonatypePublishToBundle.value,
-  releaseEarlyWith := SonatypePublisher
+  publishTo := sonatypePublishToBundle.value
+  //releaseEarlyWith := SonatypePublisher
 )
 
 lazy val publishSettings = Seq(
