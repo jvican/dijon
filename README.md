@@ -173,7 +173,6 @@ import com.github.plokhotnyuk.jsoniter_scala.core._
 TODO
 ====
 * BigInt/BigDecimal support
-* Circular references checker
 * Macro for type inference to induce compile-time errors where possible
 * JSON string interpolator fills in braces, quotes and commas etc
 

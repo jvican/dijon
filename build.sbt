@@ -1,5 +1,4 @@
 import org.scalajs.linker.interface.{CheckedBehavior, ESVersion}
-
 import scala.util._
 import scala.sys.process._
 import sbt._
@@ -81,7 +80,7 @@ lazy val root = project
   .in(file("."))
   .settings(commonSettings)
   .settings(noPublishSettings)
-  .aggregate(dijonJVM, dijonJS/*, FIXME: dijonNative*/)
+  .aggregate(dijonJVM, dijonJS, dijonNative)
 
 lazy val dijonJVM = dijon.jvm
 

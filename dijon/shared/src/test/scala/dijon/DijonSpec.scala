@@ -6,7 +6,6 @@ import scala.language.dynamics
 import scala.collection.mutable
 
 class DijonSpec extends AnyFunSuite {
-  val isJS = 1.0.toString == "1"
   val isWindows = System.getProperty("os.name", "").toLowerCase().indexOf("win") >= 0
   val (email1, email2) = ("pathikritbhowmick@msn.com", "pathikrit.bhowmick@gmail.com")
   val (name, age) = ("Rick", 27)
@@ -181,7 +180,7 @@ class DijonSpec extends AnyFunSuite {
         |  "apply": 42
         |}""".stripMargin
 
-    if (isWindows || isJS) ()
+    if (isWindows) ()
     else assert(pretty(rick) == expected)
   }
 
@@ -435,71 +434,77 @@ class DijonSpec extends AnyFunSuite {
   }
 
   test("do not parse too deeply nested JSON") {
-    val tests = Seq(
-      "[" * 129 + "]" * 129 -> "depth limit exceeded, offset: 0x00000080",
-      "{\"x\":" * 129 + "null" + "}" * 129 -> "depth limit exceeded, offset: 0x00000280",
-      "[{\"x\":" * 65 + "null" + "}]" * 65 -> "depth limit exceeded, offset: 0x00000180",
-      "{\"x\":[" * 65 + "]}" * 65 -> "depth limit exceeded, offset: 0x00000180"
-    )
+    if (!TestUtils.isNative) {
+      val tests = Seq(
+        "[" * 129 + "]" * 129 -> "depth limit exceeded, offset: 0x00000080",
+        "{\"x\":" * 129 + "null" + "}" * 129 -> "depth limit exceeded, offset: 0x00000280",
+        "[{\"x\":" * 65 + "null" + "}]" * 65 -> "depth limit exceeded, offset: 0x00000180",
+        "{\"x\":[" * 65 + "]}" * 65 -> "depth limit exceeded, offset: 0x00000180"
+      )
 
-    for ((str, err) <- tests) {
-      assert(intercept[JsonReaderException](parse(str)).getMessage.startsWith(err))
+      for ((str, err) <- tests) {
+        assert(intercept[JsonReaderException](parse(str)).getMessage.startsWith(err))
+      }
     }
   }
 
   test("do not serialize too deeply nested JSON") {
-    val tests = Seq(
-      {
-        val json = `{}`
-        json.x = parse("{\"x\":" * 128 + "null" + "}" * 128)
-        json
-      }, {
-        val json = `[]`
-        json(0) = parse("[" * 128 + "]" * 128)
-        json
-      }
-    )
+    if (!TestUtils.isNative) {
+      val tests = Seq(
+        {
+          val json = `{}`
+          json.x = parse("{\"x\":" * 128 + "null" + "}" * 128)
+          json
+        }, {
+          val json = `[]`
+          json(0) = parse("[" * 128 + "]" * 128)
+          json
+        }
+      )
 
-    for (json <- tests) {
-      assert(intercept[JsonWriterException](compact(json)).getMessage == "depth limit exceeded")
+      for (json <- tests) {
+        assert(intercept[JsonWriterException](compact(json)).getMessage == "depth limit exceeded")
+      }
     }
   }
 
   test("do not serialize circular references") {
-    intercept[Throwable] {
-      case class A(a: A) // immutability doesn't save from circular references
+    if (!TestUtils.isNative) {
+      intercept[Throwable] {
+        case class A(a: A) // immutability doesn't save from circular references
 
-      lazy val a1: A = A(a2)
-      lazy val a2 = A(a1)
-      a1.toString
-    }
-
-    val tests = Seq(
-      {
-        val json = `{}`
-        json.x = json
-        json
-      }, {
-        val json1 = `{}`
-        val json2 = `{}`
-        json1.x = json2
-        json2.y = json1
-        json1
-      }, {
-        val json = `[]`
-        json(0) = json
-        json
-      }, {
-        val json1 = `[]`
-        val json2 = `[]`
-        json1(0) = json2
-        json2(0) = json1
-        json1
+        lazy val a1: A = A(a2)
+        lazy val a2 = A(a1)
+        a1.toString
       }
-    )
 
-    for (json <- tests) {
-      assert(intercept[JsonWriterException](compact(json)).getMessage == "depth limit exceeded")
+      val tests = Seq(
+        {
+          val json = `{}`
+          json.x = json
+          json
+        }, {
+          val json1 = `{}`
+          val json2 = `{}`
+          json1.x = json2
+          json2.y = json1
+          json1
+        }, {
+          val json = `[]`
+          json(0) = json
+          json
+        }, {
+          val json1 = `[]`
+          val json2 = `[]`
+          json1(0) = json2
+          json2(0) = json1
+          json1
+        }
+      )
+
+      for (json <- tests) {
+        assert(intercept[JsonWriterException](compact(json)).getMessage == "depth limit exceeded")
+      }
     }
   }
 
@@ -593,7 +598,7 @@ class DijonSpec extends AnyFunSuite {
     obj.str = """my
                 |multiline
                 |string""".stripMargin
-    if (isWindows || isJS) ()
+    if (isWindows) ()
     else assert(obj.str.toString == raw""""my\nmultiline\nstring"""")
   }
 
