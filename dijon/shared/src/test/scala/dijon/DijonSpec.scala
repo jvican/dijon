@@ -1,9 +1,9 @@
 package dijon
 
 import com.github.plokhotnyuk.jsoniter_scala.core.{JsonReaderException, JsonWriterException}
-
-import scala.collection.mutable
 import org.scalatest.funsuite.AnyFunSuite
+import scala.language.dynamics
+import scala.collection.mutable
 
 class DijonSpec extends AnyFunSuite {
   val isJS = 1.0.toString == "1"

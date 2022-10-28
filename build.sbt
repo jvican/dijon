@@ -2,6 +2,7 @@ import org.scalajs.linker.interface.{CheckedBehavior, ESVersion}
 
 import scala.util._
 import scala.sys.process._
+import sbt._
 
 lazy val oldVersion = Try("git describe --abbrev=0".!!.trim.replaceAll("^v", "")).getOrElse("0.2.4")
 
@@ -39,6 +40,10 @@ lazy val commonSettings = Seq(
     "-language:existentials",
     "-language:dynamics,higherKinds"
   ),
+  Compile / unmanagedSourceDirectories ++= (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, _)) => CrossType.Full.sharedSrcDir(baseDirectory.value, "main").toSeq.map(f => file(f.getPath + "-2"))
+    case _ => Seq()
+  }),
   publishTo := sonatypePublishToBundle.value,
   releaseEarlyWith := SonatypePublisher
 )
@@ -76,7 +81,7 @@ lazy val root = project
   .in(file("."))
   .settings(commonSettings)
   .settings(noPublishSettings)
-  .aggregate(dijonJVM, dijonJS)
+  .aggregate(dijonJVM, dijonJS/*, FIXME: dijonNative*/)
 
 lazy val dijonJVM = dijon.jvm
 
@@ -85,45 +90,32 @@ lazy val dijonJS = dijon.js
 lazy val dijonNative = dijon.native
 
 lazy val dijon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .crossType(CrossType.Pure)
+  .crossType(CrossType.Full)
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(
-    scalaVersion := "2.13.6", // Update .github/workflows/ci.yml when changing this
+    scalaVersion := "3.2.1",
+    crossScalaVersions := Seq("2.12.17", "2.13.10", "3.2.1"), // Update .github/workflows/ci.yml when changing this
     libraryDependencies ++= Seq(
-      "com.github.plokhotnyuk.jsoniter-scala" %%% "jsoniter-scala-core" % "2.13.3",
+      "com.github.plokhotnyuk.jsoniter-scala" %%% "jsoniter-scala-core" % "2.17.6",
       "org.scala-lang.modules" %%% "scala-collection-compat" % "2.8.1",
       "org.scalatest" %%% "scalatest" % "3.2.14" % Test
     )
   )
-  .jvmSettings(
-    crossScalaVersions := Seq(
-      "2.11.12",
-      "2.12.13",
-      "2.13.6"
-    ) // Update .github/workflows/ci.yml when changing this
-  )
   .jsSettings(
-    crossScalaVersions := Seq(
-      "2.11.12",
-      "2.12.13",
-      "2.13.6"
-    ), // Update .github/workflows/ci.yml when changing this
     scalaJSLinkerConfig ~= {
       _.withSemantics({
         _.optimized
           .withProductionMode(true)
           .withAsInstanceOfs(CheckedBehavior.Unchecked)
+          .withStringIndexOutOfBounds(CheckedBehavior.Unchecked)
           .withArrayIndexOutOfBounds(CheckedBehavior.Unchecked)
       }).withClosureCompiler(true)
         .withESFeatures(_.withESVersion(ESVersion.ES2015))
         .withModuleKind(ModuleKind.CommonJSModule)
     },
-    coverageEnabled := false // FIXME: No support for Scala.js 1.0 yet, see https://github.com/scoverage/scalac-scoverage-plugin/pull/287
+    coverageEnabled := false
   )
   .nativeSettings(
-    crossScalaVersions := Seq(
-      "2.12.13",
-      "2.13.6"
-    ) // Update .github/workflows/ci.yml when changing this
+    coverageEnabled := false
   )
