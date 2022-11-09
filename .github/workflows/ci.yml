@@ -40,5 +40,5 @@ jobs:
         env:
           SCALA_VERSION: ${{ matrix.scala }}
         run: |
-          sbt ++$SCALA_VERSION clean coverage test mimaReportBinaryIssues coverageAggregate
+          sbt ++$SCALA_VERSION! clean coverage test mimaReportBinaryIssues coverageAggregate
         shell: bash
