@@ -2,7 +2,7 @@ resolvers += Resolver.sonatypeRepo("staging")
 resolvers += Resolver.bintrayIvyRepo("sbt", "sbt-plugin-releases")
 
 val scalaJSVersion =
-  Option(System.getenv("SCALAJS_VERSION")).getOrElse("1.11.0")
+  Option(System.getenv("SCALAJS_VERSION")).getOrElse("1.12.0")
 val scalaNativeVersion =
   Option(System.getenv("SCALANATIVE_VERSION")).getOrElse("0.4.4")
 
@@ -13,5 +13,5 @@ addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.1.1")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.9.3")
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "1.1.1")
 addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.3.2")
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.14")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.15")
 addSbtPlugin("ch.epfl.scala" % "sbt-release-early" % "2.1.1+10-c6ef3f60")
