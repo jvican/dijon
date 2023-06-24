@@ -2,7 +2,7 @@ resolvers += Resolver.sonatypeRepo("staging")
 resolvers += Resolver.bintrayIvyRepo("sbt", "sbt-plugin-releases")
 
 val scalaJSVersion =
-  Option(System.getenv("SCALAJS_VERSION")).getOrElse("1.13.1")
+  Option(System.getenv("SCALAJS_VERSION")).getOrElse("1.13.2")
 val scalaNativeVersion =
   Option(System.getenv("SCALANATIVE_VERSION")).getOrElse("0.4.4")
 
