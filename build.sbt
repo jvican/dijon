@@ -93,7 +93,7 @@ lazy val dijon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     libraryDependencies ++= Seq(
       "com.github.plokhotnyuk.jsoniter-scala" %%% "jsoniter-scala-core" % "2.13.3",
       "org.scala-lang.modules" %%% "scala-collection-compat" % "2.11.0",
-      "org.scalatest" %%% "scalatest" % "3.2.16" % Test
+      "org.scalatest" %%% "scalatest" % "3.2.17" % Test
     )
   )
   .jvmSettings(
