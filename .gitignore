@@ -68,3 +68,5 @@ project/plugins/project/
 # Scala #
 .scala_dependencies
 .worksheet
+.bsp/
+.bloop/

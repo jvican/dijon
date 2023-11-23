@@ -1,13 +1,12 @@
+
 package object dijon {
-  import java.nio.charset.StandardCharsets._
-  import java.util
-
-  import UnionType.{∅, ∨}
   import com.github.plokhotnyuk.jsoniter_scala.core._
-
-  import scala.jdk.CollectionConverters._
+  import java.util
   import scala.collection.mutable
+  import scala.jdk.CollectionConverters._
+  import scala.language.{dynamics, existentials}
   import scala.util.Try
+  import UnionType.{∅, ∨}
 
   type JsonTypes = ∅ ∨ String ∨ Int ∨ Double ∨ Boolean ∨ JsonArray ∨ JsonObject ∨ None.type
   type JsonType[A] = JsonTypes#Member[A]
@@ -15,14 +14,14 @@ package object dijon {
   type JsonObject = mutable.Map[String, SomeJson]
   type JsonArray = mutable.Buffer[SomeJson]
 
-  def `[]` : SomeJson = new mutable.ArrayBuffer[SomeJson](initArrayCapacity)
+  def `[]`: SomeJson = new mutable.ArrayBuffer[SomeJson](initArrayCapacity)
 
-  def `{}` : SomeJson = new util.LinkedHashMap[String, SomeJson](initMapCapacity).asScala
+  def `{}`: SomeJson = new util.LinkedHashMap[String, SomeJson](initMapCapacity).asScala
 
   def obj(values: (String, SomeJson)*): SomeJson = {
     val len = values.length
-    var i = 0
     val map = new util.LinkedHashMap[String, SomeJson](len)
+    var i = 0
     while (i < len) {
       val kv = values(i)
       map.put(kv._1, kv._2)
@@ -131,16 +130,14 @@ package object dijon {
       case arr: JsonArray =>
         arr.foldLeft(new mutable.ArrayBuffer[SomeJson](arr.length))((res, x) => res += x.deepCopy)
       case obj: JsonObject =>
-        obj
-          .foldLeft(new util.LinkedHashMap[String, SomeJson](obj.size)) { (res, kv) =>
-            res.put(kv._1, kv._2.deepCopy)
-            res
-          }
-          .asScala
-      case _ => this
+        obj.foldLeft(new util.LinkedHashMap[String, SomeJson](obj.size)) { (res, kv) =>
+          res.put(kv._1, kv._2.deepCopy)
+          res
+        }.asScala
+      case _ => underlying
     }
 
-    override def toString: String = compact(this)
+    override def toString: String = compact(underlying)
 
     override def equals(obj: Any): Boolean = underlying == (obj match {
       case that: SomeJson => that.underlying
@@ -189,7 +186,10 @@ package object dijon {
         if (!in.isNextToken(']')) {
           in.rollbackToken()
           val dp = depth - 1
-          do arr += decode(in, dp) while (in.isNextToken(','))
+          while ({
+            arr += decode(in, dp)
+            in.isNextToken(',')
+          }) ()
           if (!in.isCurrentToken(']')) in.arrayEndOrCommaError()
         }
         arr
@@ -199,7 +199,10 @@ package object dijon {
         if (!in.isNextToken('}')) {
           in.rollbackToken()
           val dp = depth - 1
-          do obj.put(in.readKeyAsString(), decode(in, dp)) while (in.isNextToken(','))
+          while ({
+            obj.put(in.readKeyAsString(), decode(in, dp))
+            in.isNextToken(',')
+          }) ()
           if (!in.isCurrentToken('}')) in.objectEndOrCommaError()
         }
         obj.asScala

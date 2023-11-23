@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         jdk: [zulu@1.8, graalvm-ce-java11@20.3.0, openjdk@1.15]
-        scala: [2.12.14, 2.13.6]
+        scala: [2.12.17, 2.13.10, 3.2.1]
     name: Test ${{ matrix.os }} -- ${{ matrix.jdk }}
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
         run: |
           ./bin/scalafmt --test
         shell: bash
-      - name: Compile and test jsonrpc4s
+      - name: Compile and test
         env:
           SCALA_VERSION: ${{ matrix.scala }}
         run: |

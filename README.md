@@ -4,6 +4,9 @@ dijon - Dynamic JSON in Scala
 =====
 * Boiler-free JSON wrangling using Scala [Dynamic Types](https://www.scala-lang.org/api/2.13.2/scala/Dynamic.html)
 * Support of [RFC8259](https://tools.ietf.org/html/rfc8259) using a codec based on [jsoniter-scala-core][2] that [passes all JSONTestSuite checks](https://github.com/nst/JSONTestSuite/pull/99)
+* Support of Scala 2.12, 2.13, and 3
+* Support of Scala.js and Scala Native
+* Require JDK 11+ when running on JVMs
 * Why yet another Scala JSON library? Well, code speaks more than thousand words:
 
 ```scala
@@ -148,7 +151,7 @@ Usage
 ===
 1. Add the following to your `build.sbt`:
 ```scala
-libraryDependency += "me.vican.jorge" %% "dijon" % "0.6.0" // Use %%% instead of %% for Scala.js
+libraryDependency += "me.vican.jorge" %% "dijon" % "0.6.0" // Use %%% instead of %% for Scala.js and Scala Native
 ```
 2. Turn on support of dynamic types by adding import clause:
 ```scala
@@ -169,9 +172,7 @@ import com.github.plokhotnyuk.jsoniter_scala.core._
 
 TODO
 ====
-* BigInt support
-* Circular references checker
-* YAML interpolator
+* BigInt/BigDecimal support
 * Macro for type inference to induce compile-time errors where possible
 * JSON string interpolator fills in braces, quotes and commas etc
 
